@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class HazavaoTest {
-  Hazavao hazavao = new Hazavao();
+  Hazavao hazavao = new Hazavao("dummy");
 
   @Disabled
   @Test

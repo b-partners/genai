@@ -7,12 +7,14 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.function.Function;
+import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 
+@AllArgsConstructor
 public class Hazavao implements Function<String, String> {
 
   private static final String OPENAPI_URL = "https://api.openai.com/v1/chat/completions";
-  private static final String OPENAPI_KEY = "";
+  private final String openapiKey;
 
   @SneakyThrows
   @Override
@@ -26,7 +28,7 @@ public class Hazavao implements Function<String, String> {
     return root.path("choices").get(0).path("message").path("content").asText();
   }
 
-  private static HttpRequest openapiRequest(String toDefine, ObjectMapper mapper) {
+  private HttpRequest openapiRequest(String toDefine, ObjectMapper mapper) {
     var message = mapper.createObjectNode();
     message.put("role", "user");
     message.put(
@@ -43,7 +45,7 @@ public class Hazavao implements Function<String, String> {
     return HttpRequest.newBuilder()
         .uri(URI.create(OPENAPI_URL))
         .header("Content-Type", "application/json")
-        .header("Authorization", "Bearer " + OPENAPI_KEY)
+        .header("Authorization", "Bearer " + openapiKey)
         .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
         .build();
   }
