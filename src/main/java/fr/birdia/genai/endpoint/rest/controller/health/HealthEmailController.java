@@ -1,5 +1,6 @@
 package fr.birdia.genai.endpoint.rest.controller.health;
 
+import static fr.birdia.genai.endpoint.rest.controller.health.PingController.OK;
 import static java.io.File.createTempFile;
 
 import fr.birdia.genai.PojaGenerated;
@@ -73,6 +74,6 @@ public class HealthEmailController {
             "[poja health check 5/5] With attachment",
             null,
             List.of(createTempFile("attachment", ".txt"))));
-    return PingController.OK;
+    return OK;
   }
 }

@@ -25,7 +25,7 @@ repositories {
 }
 
 java {
-    group = 'school.hei.hazavao'
+    group = 'fr.birdia.genai'
     sourceCompatibility = '21'
     targetCompatibility = '21'
 }
@@ -144,8 +144,6 @@ dependencies {
     testImplementation 'org.testcontainers:junit-jupiter:1.19.1'
     testImplementation 'org.junit-pioneer:junit-pioneer:2.2.0'
 
-implementation 'dev.langchain4j:langchain4j-open-ai:1.1.0'
-implementation 'dev.langchain4j:langchain4j:1.1.0'
 
 
 }

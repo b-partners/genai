@@ -1,11 +1,12 @@
 package fr.birdia.genai.endpoint;
 
+import static fr.birdia.genai.concurrency.ThreadRenamer.renameFrontalThread;
+import static fr.birdia.genai.concurrency.ThreadRenamer.renameThread;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
 import static java.util.stream.Collectors.joining;
 
 import fr.birdia.genai.PojaGenerated;
-import fr.birdia.genai.concurrency.ThreadRenamer;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -41,7 +42,7 @@ public class RequestLoggerConfigurer implements WebMvcConfigurer {
       Thread current = currentThread();
       String oldThreadName = current.getName();
       request.setAttribute(THREAD_OLD_NAME, oldThreadName);
-      ThreadRenamer.renameFrontalThread(current);
+      renameFrontalThread(current);
 
       String parameters =
           request.getParameterMap().entrySet().stream()
@@ -65,7 +66,7 @@ public class RequestLoggerConfigurer implements WebMvcConfigurer {
         @Nullable Exception ex) {
       long duration = currentTimeMillis() - (long) request.getAttribute(REQUEST_START_TIME);
       log.info("afterCompletion: status={}, duration={}ms", response.getStatus(), duration, ex);
-      ThreadRenamer.renameThread(currentThread(), request.getAttribute(THREAD_OLD_NAME).toString());
+      renameThread(currentThread(), request.getAttribute(THREAD_OLD_NAME).toString());
     }
   }
 }
