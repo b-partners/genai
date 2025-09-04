@@ -25,7 +25,7 @@ public class EventServiceInvoker implements Consumer<TypedEvent> {
   @Override
   public void accept(TypedEvent typedEvent) {
     var typeName = typedEvent.typeName();
-    var eventClasses = getAllClasses("school.hei.hazavao.endpoint.event.model");
+    var eventClasses = getAllClasses("fr.birdia.genai.endpoint.event.model");
     for (var clazz : eventClasses) {
       if (clazz.getTypeName().equals(typeName)) {
         var serviceClazz = Class.forName(getEventService(typeName));
@@ -40,7 +40,7 @@ public class EventServiceInvoker implements Consumer<TypedEvent> {
 
   private String getEventService(String eventClazzName) {
     var typeNameAsArray = eventClazzName.split("\\.");
-    return "school.hei.hazavao.service.event."
+    return "fr.birdia.genai.service.event."
         + typeNameAsArray[typeNameAsArray.length - 1]
         + "Service";
   }

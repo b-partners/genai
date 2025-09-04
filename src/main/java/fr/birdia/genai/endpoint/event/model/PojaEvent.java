@@ -1,5 +1,6 @@
 package fr.birdia.genai.endpoint.event.model;
 
+import static fr.birdia.genai.endpoint.event.EventStack.EVENT_STACK_1;
 import static java.lang.Math.random;
 
 import fr.birdia.genai.PojaGenerated;
@@ -34,11 +35,11 @@ public abstract class PojaEvent implements Serializable {
   }
 
   public EventStack getEventStack() {
-    return EventStack.EVENT_STACK_1;
+    return EVENT_STACK_1;
   }
 
   public String getEventSource() {
-    if (getEventStack().equals(EventStack.EVENT_STACK_1)) return "school.hei.hazavao.event1";
-    return "school.hei.hazavao.event2";
+    if (getEventStack().equals(EVENT_STACK_1)) return "fr.birdia.genai.event1";
+    return "fr.birdia.genai.event2";
   }
 }

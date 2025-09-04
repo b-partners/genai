@@ -1,5 +1,7 @@
 package fr.birdia.genai.concurrency;
 
+import static fr.birdia.genai.concurrency.ThreadRenamer.getRandomSubThreadNamePrefixFrom;
+import static fr.birdia.genai.concurrency.ThreadRenamer.renameThread;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor;
 
@@ -30,9 +32,8 @@ public class Workers {
                 c ->
                     (Callable<Void>)
                         () -> {
-                          ThreadRenamer.renameThread(
-                              parentThread,
-                              ThreadRenamer.getRandomSubThreadNamePrefixFrom(parentThread));
+                          renameThread(
+                              parentThread, getRandomSubThreadNamePrefixFrom(parentThread));
                           return c.call();
                         })
             .toList();
