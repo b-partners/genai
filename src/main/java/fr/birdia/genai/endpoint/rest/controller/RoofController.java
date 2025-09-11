@@ -17,13 +17,42 @@ public class RoofController {
 
   @GetMapping(value = "/toiture", produces = TEXT_HTML_VALUE)
   public String hazavao(
-      @RequestParam String revetement,
-      double usure,
-      double humidité,
-      double moisissure,
-      double surfaceEnM2) {
-    var analyse =
-        analyseurToiture.apply(new Toit(revetement, usure, humidité, moisissure, surfaceEnM2));
-    return analyse;
+      @RequestParam(required = false) String adresse,
+      @RequestParam(required = false) String gps,
+      @RequestParam(required = false) Integer millesimeImage1,
+      @RequestParam(required = false) Integer millesimeImage2,
+      Double surfaceEnM2,
+      @RequestParam(required = false) String typeToiture,
+      @RequestParam(required = false) Double penteMin,
+      @RequestParam(required = false) Double penteMax,
+      String revetement,
+      Double humidité,
+      Double moisissure,
+      Double usure,
+      @RequestParam(required = false) String obstacles,
+      @RequestParam(required = false) String mutation,
+      @RequestParam(required = false) Boolean fissureCassure,
+      @RequestParam(required = false) Boolean risqueFeu,
+      @RequestParam(required = false) Double noteDegradationGlobale) {
+
+    return analyseurToiture.apply(
+        new Toit(
+            adresse,
+            gps,
+            millesimeImage1,
+            millesimeImage2,
+            surfaceEnM2,
+            typeToiture,
+            penteMin,
+            penteMax,
+            revetement,
+            humidité,
+            moisissure,
+            usure,
+            obstacles,
+            mutation,
+            fissureCassure,
+            risqueFeu,
+            noteDegradationGlobale));
   }
 }
