@@ -71,16 +71,20 @@ Utilise quelques emojis pertinents (sans en abuser)."""
 1) Rends UNIQUEMENT du HTML (aucun texte hors balises).
 2) Structure à respecter :
    <h2>COMPRENDRE VOTRE RAPPORT</h2>
-   <p>(catégorie A–E calculée à partir de la note_degradation : A <8 ; B 8–20 ; C 20–30 ; D 30–40 ; E >40). Affiche la pastille couleur et l’intitulé exact.</p>
+   <h3><span>_pastille_emoji_</span> CATÉGORIE _lettre_catégorie_ : _libelle_catégorie_</h3>
 
    <h3>Analyse des résultats</h3>
-   <p>Analyse factuelle (300–400 mots au total pour le document, cette section inclut des chiffres clés) :\s
-   – Décris l’état des revêtements {{revetements}} sur {{surface_totale}} m² et la pente {{pente_min}}–{{pente_max}}°.\s
-   – Interprète les indicateurs : humidité {{taux_humidite}} %, moisissure {{taux_moisissure}} %, usure {{taux_usure}} %.\s
-   – Mentionne les obstacles {{obstacles}} et leurs effets (écoulement, points singuliers).\s
-   – Compare {{mille_1}} vs {{mille_2}} si {{mutation}} ≠ “néant”.\s
-   – Si humidité >25 % ⇒ évoque stagnation/écoulement ; si moisissure >20 % ⇒ évoque porosité/entretien ; si usure >30 % ⇒ évoque perte d’étanchéité ; si pente <5° ⇒ vigilance sur ruissellement ; si fissures = oui ⇒ alerte infiltration ; sinon souligne les points positifs.
-   – Cappe toute valeur aberrante >100 % à 100 % dans le texte.</p>
+   <ul>
+     <li>Analyse factuelle (cette section inclut des chiffres clés)</li>
+   </ul>
+   <ul>
+     <li>Décris l’état des revêtements {{revetements}} sur {{surface_totale}} m² et la pente {{pente_min}}–{{pente_max}}°.</li>
+     <li>Interprète les indicateurs : humidité {{taux_humidite}} %, moisissure {{taux_moisissure}} %, usure {{taux_usure}} %.</li>
+     <li>Mentionne les obstacles {{obstacles}} et leurs effets (écoulement, points singuliers).</li>
+     <li>Compare {{mille_1}} vs {{mille_2}} si {{mutation}} ≠ “néant”.</li>
+     <li>Si humidité >25 % ⇒ évoque stagnation/écoulement ; si moisissure >20 % ⇒ évoque porosité/entretien ; si usure >30 % ⇒ évoque perte d’étanchéité ; si pente <5° ⇒ vigilance sur ruissellement ; si fissures = oui ⇒ alerte infiltration ; sinon souligne les points positifs.</li>
+     <li>Cappe toute valeur aberrante >100 % à 100 % dans le texte.</li>
+   </ul>
 
    <h3>Conseils de l’expert</h3>
    <ul>
@@ -92,6 +96,9 @@ Utilise quelques emojis pertinents (sans en abuser)."""
    </ul>
 
 3) Style :
+• _lettre_catégorie_ : calculée à partir de la note_degradation A si <8 ; B si 8–20 ; C si 20–30 ; D si 30–40 ; E si >40
+• _pastille_emoji_ : A=🟢, B=🟡, C=🟠, D=🟠, E=🔴
+• _libelle_catégorie_ : A « Bon état », B « Entretien à prévoir », C « Entretien nécessaire », D « Réparation nécessaire », E « Intervention urgente ».
 • 300–400 mots au total (les deux sections cumulées).
 • Pas de jargon inutile ; explications concrètes et actionnables.
 • N’affiche pas les variables brutes ; intègre-les naturellement dans le texte.
