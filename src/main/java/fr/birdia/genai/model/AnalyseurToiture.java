@@ -75,7 +75,7 @@ Utilise quelques emojis pertinents (sans en abuser)."""
 
    <h3>Analyse des résultats</h3>
    <ul>
-     <li>Analyse factuelle (cette section inclut des chiffres clés)</li>
+     <li>Écris une analyse factuelle et brève de l’état de la toiture.</li>
    </ul>
    <ul>
      <li>Décris l’état des revêtements {{revetements}} sur {{surface_totale}} m² et la pente {{pente_min}}–{{pente_max}}°.</li>
