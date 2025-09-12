@@ -43,9 +43,9 @@ Données (variables) :
 • Type de toiture : {{type_toiture}} = %s (ex. 3 pans / terrasse)
 • Pente (°) : {{pente_min}}–{{pente_max}} = %s-%s
 • Revêtements détectés : {{revetements}} = %s
-• Taux d’humidité (%) : {{taux_humidite}} = %s
-• Taux de moisissure (%) : {{taux_moisissure}} = %s
-• Taux d’usure (%) : {{taux_usure}} = %s
+• Taux d’humidité (%%) : {{taux_humidite}} = %s
+• Taux de moisissure (%%) : {{taux_moisissure}} = %s
+• Taux d’usure (%%) : {{taux_usure}} = %s
 • Obstacles/équipements : {{obstacles}} = %s (velux, cheminées, PV, HVAC…)
 • Fissures/cassures : {{fissures}} = %s (oui/non)
 • Risque feu : {{risque_feu}} = %s (oui/non)
