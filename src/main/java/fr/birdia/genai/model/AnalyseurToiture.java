@@ -29,14 +29,14 @@ public class AnalyseurToiture implements Function<Toit, String> {
 
   private String getAIReport(Toit toit) {
     return chat.apply(
-        """
+            """
 Tu es un artisan couvreur expérimenté. Tu rédiges un rapport court, clair et pédagogique pour un propriétaire.
 RÉSULTAT EXIGÉ : UNIQUEMENT du HTML (aucun texte hors balises). 300–400 mots max au total.
 N’utilise que les emojis suivants : 🟢🟡🟠🔴 🔍 🧼 🛠️ 📸 🧪 🧯.
 Ne fais pas de disclaimer juridique.\n"""
-            .concat(
-                String.format(
-                    """
+                .concat(
+                    String.format(
+                        """
 Données (variables) :
 • Millésimes comparés : {{millesime_1}} = %s ; {{millesime_2}} = %s
 • Surface totale (m²) : {{surface_totale}} = %s
@@ -51,21 +51,21 @@ Données (variables) :
 • Risque feu : {{risque_feu}} = %s (oui/non)
 
 """,
-                    toit.millesimeImage1(),
-                    toit.millesimeImage2(),
-                    toit.surfaceEnM2(),
-                    toit.typeToiture(),
-                    toit.penteMin(),
-                    toit.penteMax(),
-                    toit.revetement(),
-                    toit.humidité(),
-                    toit.moisissure(),
-                    toit.usure(),
-                    toit.obstacles(),
-                    toit.fissureCassure() ? "OUI" : "NON",
-                    toit.risqueFeu() ? "OUI" : "NON"))
-            .concat(
-                """
+                        toit.millesimeImage1(),
+                        toit.millesimeImage2(),
+                        toit.surfaceEnM2(),
+                        toit.typeToiture(),
+                        toit.penteMin(),
+                        toit.penteMax(),
+                        toit.revetement(),
+                        toit.humidité(),
+                        toit.moisissure(),
+                        toit.usure(),
+                        toit.obstacles(),
+                        toit.fissureCassure() ? "OUI" : "NON",
+                        toit.risqueFeu() ? "OUI" : "NON"))
+                .concat(
+                    """
 Règles:
 • Catégorie = A (<8), B (8–20), C (20–30), D (30–40), E (>40).
 • Pastille : A=🟢, B=🟡, C=🟠, D=🟠, E=🔴.\s
@@ -101,6 +101,8 @@ Contraintes de structure (respect strict) :
 </section>
 
 
-Produis maintenant le rapport en HTML en remplissant intelligemment les variables ci-dessus."""));
+Produis maintenant le rapport en HTML en remplissant intelligemment les variables ci-dessus."""))
+        .replace("```html", "")
+        .replace("```", "");
   }
 }
