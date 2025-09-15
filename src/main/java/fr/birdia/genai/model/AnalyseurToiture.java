@@ -29,83 +29,81 @@ public class AnalyseurToiture implements Function<Toit, String> {
 
   private String getAIReport(Toit toit) {
     return chat.apply(
-            """
-Tu es un artisan couvreur expérimenté.
-Tu t’adresses à un propriétaire : ton ton est clair, pédagogique et rassurant.
-Utilise quelques emojis pertinents (sans en abuser)."""
-                .concat(
-                    String.format(
-                        """
-➤ Données d’entrée (variables) :
-• Millésimes d’images : {{mille_1}} = %s ; {{mille_2}} = %s
-• Surface totale (m²) : {{surface_totale}} = %s
-• Type de toiture (nb de pans / terrasse) : {{type_toiture}} = %s
-• Pente (°) : {{pente_min}}–{{pente_max}} = %s-%s
-• Revêtements (liste) : {{revetements}} = %s
-• Taux d’humidité (%%) : {{taux_humidite}} = %s
-• Taux de moisissure (%%) : {{taux_moisissure}} = %s
-• Taux d’usure (%%) : {{taux_usure}} = %s
-• Obstacles/détails (velux, cheminées, PV, équipements) : {{obstacles}} = %s
-• Mutations (ex : rénovation, dégradation) : {{mutation}} = %s
-• Fissures/cassures : {{fissures}} = %s
-• Risque feu : {{risque_feu}} = %s
+        """
+Tu es un artisan couvreur expérimenté, spécialiste des toitures depuis plus de 15 ans.
+Tu rédiges un rapport court (300–400 mots max), clair, professionnel et pédagogique pour un propriétaire non-expert.
+Ton objectif est double :
+	1.	Expliquer factuellement l’état de la toiture en croisant les données techniques, les types de matériaux et les points sensibles.
+	2.	Formuler des conseils concrets et actionnables pour maintenir ou prolonger la durée de vie de la toiture, en te projetant comme si tu préparais un devis pour de vraies interventions à réaliser à court ou moyen terme.
 
-""",
-                        toit.millesimeImage1(),
-                        toit.millesimeImage2(),
-                        toit.surfaceEnM2(),
-                        toit.typeToiture(),
-                        toit.penteMin(),
-                        toit.penteMax(),
-                        toit.revetement(),
-                        toit.humidité(),
-                        toit.moisissure(),
-                        toit.usure(),
-                        toit.obstacles(),
-                        toit.mutation(),
-                        toit.fissureCassure() ? "OUI" : "NON",
-                        toit.risqueFeu() ? "OUI" : "NON"))
-                .concat(
+🛑 Interdictions :
+	•	Ne fais aucun disclaimer juridique.
+	•	Ne dépasse jamais 400 mots.
+	•	Ne parle jamais d’argent.
+	•	Ne répète pas les données brutes : interprète-les.
+
+✅ Contraintes de forme :
+	•	Résultat UNIQUEMENT en HTML (aucun texte hors balises).
+	•	Utilise uniquement les emojis suivants : 🟢🟡🟠🔴 🔍 🧼 🛠️ 📸 🧪 🧯
+	•	Respecte strictement la structure suivante :
+
+
+<section>
+  <h2>COMPRENDRE VOTRE RAPPORT</h2>
+  <h3><span>{{pastille_emoji}}</span> CATÉGORIE {{lettre}} : {{intitule_categorie}}</h3>
+"""
+            .concat(
+                String.format(
                     """
-➤ Règles de sortie :
-1) Rends UNIQUEMENT du HTML (aucun texte hors balises).
-2) Structure à respecter :
-   <h2>COMPRENDRE VOTRE RAPPORT</h2>
-   <h3><span>_pastille_emoji_</span> CATÉGORIE _lettre_catégorie_ : _libelle_catégorie_</h3>
+  <ul>
+    <li>L’analyse couvre %s m² (pente %s°–%s°, %s). Revêtement : %s.</li>
+    <li>Humidité : %s %% • Moisissure : %s %% • Usure : %s %% — interprète leur impact selon le type de revêtement et la pente (ex. stagnation, porosité, vieillissement prématuré).</li>
+    <li>Points sensibles : %s — explique leur impact (pénétrations, joints, zones à risque d’infiltration ou de mousse).</li>
+    <li>Signes de détérioration : fissures = "%s" ; risque feu = "%s" — interprète le contexte (zones à forte exposition, végétation proche, matériaux inflammables, etc.).</li>
+  </ul>
+""",
+                    toit.surfaceEnM2(),
+                    toit.penteMin(),
+                    toit.penteMax(),
+                    toit.typeToiture(),
+                    toit.revetement(),
+                    toit.humidité(),
+                    toit.moisissure(),
+                    toit.usure(),
+                    toit.obstacles(),
+                    toit.fissureCassure() ? "OUI" : "NON",
+                    toit.risqueFeu() ? "OUI" : "NON"))
+            .concat(
+                """
+</section>
+<section>
+  <h2>CONSEILS DE L’ARTISAN COUVREUR</h2>
+""")
+            .concat(
+                String.format(
+                    """
+<ul>
+  <li>🔍 Inspection ciblée : recommander les zones à vérifier (ex. autour de %s, pentes faibles, angles rentrants, zones d’accumulation d’eau ou de mousse).</li>
+  <li>🧼 Entretien recommandé : nettoyage préventif (mousses, lichens), curage des évacuations, élimination des dépôts pouvant accélérer l’usure ou l’humidité.</li>
+  <li>🛠️ Travaux à envisager : lister les réparations concrètes (ex. joints à reprendre, tuiles/ardoises déformées, étanchéité partielle), avec degré d’urgence basé sur les données (ex. %s %%, %s %%).</li>
+  <li>📸 Suivi : recommander un rythme de contrôle (visuel / drone / thermique) selon la catégorie (C/D/E → semestriel, A/B → annuel), pour anticiper au lieu de subir.</li>
+  <li>🧪 Vérifications complémentaires : proposer des tests adaptés (ex. arrosage ciblé, caméra thermique, vérification du dimensionnement des évacuations selon pente).</li>
+</ul>
+""",
+                    toit.obstacles(), toit.usure(), toit.humidité()))
+            .concat(
+                """
+</section>
 
-   <h3>Analyse des résultats</h3>
-   <ul>
-     <li>Écris une analyse factuelle et brève de l’état de la toiture.</li>
-   </ul>
-   <ul>
-     <li>Décris l’état des revêtements {{revetements}} sur {{surface_totale}} m² et la pente {{pente_min}}–{{pente_max}}°.</li>
-     <li>Interprète les indicateurs : humidité {{taux_humidite}} %, moisissure {{taux_moisissure}} %, usure {{taux_usure}} %.</li>
-     <li>Mentionne les obstacles {{obstacles}} et leurs effets (écoulement, points singuliers).</li>
-     <li>Compare {{mille_1}} vs {{mille_2}} si {{mutation}} ≠ “néant”.</li>
-     <li>Si humidité >25 % ⇒ évoque stagnation/écoulement ; si moisissure >20 % ⇒ évoque porosité/entretien ; si usure >30 % ⇒ évoque perte d’étanchéité ; si pente <5° ⇒ vigilance sur ruissellement ; si fissures = oui ⇒ alerte infiltration ; sinon souligne les points positifs.</li>
-     <li>Cappe toute valeur aberrante >100 % à 100 % dans le texte.</li>
-   </ul>
-
-   <h3>Conseils de l’expert</h3>
-   <ul>
-     <li>🔍 Inspection ciblée (où et pourquoi, en citant les zones et causes probables).</li>
-     <li>🧼 Entretien/Nettoyage (mousses, chéneaux, crapaudines, évacuations).</li>
-     <li>🛠️ Travaux correctifs (priorisés selon le risque et la catégorie A–E ; indiquer court/moyen terme).</li>
-     <li>📆 Suivi (fréquence de contrôle par imagerie et/ou visite, selon saison et exposition).</li>
-     <li>⚡ Option énergie (si PV possible : état du champ libre, ombrages, prérequis étanchéité).</li>
-   </ul>
-
-3) Style :
-• _lettre_catégorie_ : calculée à partir de la note_degradation A si <8 ; B si 8–20 ; C si 20–30 ; D si 30–40 ; E si >40
-• _pastille_emoji_ : A=🟢, B=🟡, C=🟠, D=🟠, E=🔴
-• _libelle_catégorie_ : A « Bon état », B « Entretien à prévoir », C « Entretien nécessaire », D « Réparation nécessaire », E « Intervention urgente ».
-• 300–400 mots au total (les deux sections cumulées).
-• Pas de jargon inutile ; explications concrètes et actionnables.
-• N’affiche pas les variables brutes ; intègre-les naturellement dans le texte.
-• N’ajoute pas de disclaimer juridique.
-
-Produis maintenant le rapport en HTML selon ces consignes, à partir des variables fournies."""))
-        .replace("```html", "")
-        .replace("```", "");
+🔁 Logique d’analyse attendue :
+	•	Si le revêtement est poreux (ex. tuiles béton, anciennes ardoises), commente plus l’humidité/moisissure.
+	•	Si pente <10°, alerte sur évacuations et zones de stagnation.
+	•	Si obstacles présents, insiste sur étanchéité périphérique.
+	•	Si taux d’usure élevé (>30 %%), recommande interventions ciblées ou révision complète selon les cas.
+	•	Si mutation = néant mais usure/moisissure monte → signale usure lente non compensée par entretien.
+	•	Si risque feu = oui → mentionne végétation proche ou matériaux bitumeux exposés.
+""")
+            .replace("```html", "")
+            .replace("```", ""));
   }
 }
