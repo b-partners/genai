@@ -56,7 +56,7 @@ Ton objectif est double :
                     String.format(
                         """
   <ul>
-    <li>L’analyse couvre %s m² (pente %s°–%s°, %s). Revêtement : %s.</li>
+    <li>L’analyse couvre %s m² (pente %s°–%s°). Revêtement : %s.</li>
     <li>Humidité : %s %% • Moisissure : %s %% • Usure : %s %% — interprète leur impact selon le type de revêtement et la pente (ex. stagnation, porosité, vieillissement prématuré).</li>
     <li>Points sensibles : %s — explique leur impact (pénétrations, joints, zones à risque d’infiltration ou de mousse).</li>
     <li>Signes de détérioration : fissures = "%s" ; risque feu = "%s" — interprète le contexte (zones à forte exposition, végétation proche, matériaux inflammables, etc.).</li>
@@ -65,7 +65,6 @@ Ton objectif est double :
                         toit.surfaceEnM2(),
                         toit.penteMin(),
                         toit.penteMax(),
-                        toit.typeToiture(),
                         toit.revetement(),
                         toit.humidité(),
                         toit.moisissure(),
