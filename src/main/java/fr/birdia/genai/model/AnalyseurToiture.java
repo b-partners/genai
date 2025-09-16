@@ -55,11 +55,10 @@ Ton objectif est double :
                 .concat(
                     String.format(
                         """
-    INSTRUCTION (contient des données à utiliser)
+    INSTRUCTION (contient des données à utiliser, NE PAS AFFICHER DANS LE RESULTAT)
     L’analyse couvre %s m² (pente %s°–%s°). Revêtement : %s.
-    Humidité : %s %% • Moisissure : %s %% • Usure : %s %% — interprète leur impact selon le type de revêtement et la pente (ex. stagnation, porosité, vieillissement prématuré).
-    Points sensibles (obstacles) : %s — explique leur impact (pénétrations, joints, zones à risque d’infiltration ou de mousse).
-    Signes de détérioration : fissures = "%s" ; risque feu = "%s" — interprète le contexte (zones à forte exposition, végétation proche, matériaux inflammables, etc.).
+    Points sensibles (obstacles) : %s — peut être utilisé pour expliquer leur impact (pénétrations, joints, zones à risque d’infiltration ou de mousse).
+    Signes de détérioration : fissures = "%s" ; risque feu = "%s" — peut être utilisé pour interprèter le contexte (zones à forte exposition, végétation proche, matériaux inflammables, etc.).
     FIN_INSTRUCTION
 
     <ul>
