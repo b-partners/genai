@@ -71,8 +71,7 @@ Ton objectif est double :
     </ul>
 
     <ul>
-      <li>INSTRUCTION: indique le type de toiture, l’humidité et le taux d’usure. FIN_INSTRUCTION</li>
-      <li>INSTRUCTION: fais une analyse des données de l’instruction précédente en expliquant leur impact. FIN_INSTRUCTION</li>
+      <li>INSTRUCTION: fais une analyse des données concernant le type de toiture, l'humidité et le taux d'usure, en expliquant leur impact. FIN_INSTRUCTION</li>
     </ul>
 """,
                         toit.surfaceEnM2(),
