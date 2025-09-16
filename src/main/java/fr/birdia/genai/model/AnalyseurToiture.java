@@ -50,7 +50,7 @@ Ton objectif est double :
 
 <section>
   <h2>COMPRENDRE VOTRE RAPPORT</h2>
-  <h3><span>{{pastille_emoji}}</span> CATÉGORIE {{lettre}} : {{intitule_categorie}}</h3>
+  <h3><span>{{pastille_emoji}}</span> CATÉGORIE {{lettre}} : {{etat_toiture}}</h3>
 """
                 .concat(
                     String.format(
