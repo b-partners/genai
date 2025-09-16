@@ -45,7 +45,7 @@ Ton objectif est double :
 ✅ Contraintes de forme :
 	•	Résultat UNIQUEMENT en HTML (aucun texte hors balises).
 	•	Utilise uniquement les emojis suivants : 🟢🟡🟠🔴 🔍 🧼 🛠️ 📸 🧪 🧯
-	•	Respecte strictement la structure suivante :
+	•	Respecte strictement la structure suivante, de telle sorte que les blocs INSTRUCTION soient remplacés par l’instruction donnée:
 
 
 <section>
@@ -55,12 +55,21 @@ Ton objectif est double :
                 .concat(
                     String.format(
                         """
-  <ul>
-    <li>L’analyse couvre %s m² (pente %s°–%s°). Revêtement : %s.</li>
-    <li>Humidité : %s %% • Moisissure : %s %% • Usure : %s %% — interprète leur impact selon le type de revêtement et la pente (ex. stagnation, porosité, vieillissement prématuré).</li>
-    <li>Points sensibles : %s — explique leur impact (pénétrations, joints, zones à risque d’infiltration ou de mousse).</li>
-    <li>Signes de détérioration : fissures = "%s" ; risque feu = "%s" — interprète le contexte (zones à forte exposition, végétation proche, matériaux inflammables, etc.).</li>
-  </ul>
+    INSTRUCTION (contient des données à utiliser)
+    L’analyse couvre %s m² (pente %s°–%s°). Revêtement : %s.
+    Humidité : %s %% • Moisissure : %s %% • Usure : %s %% — interprète leur impact selon le type de revêtement et la pente (ex. stagnation, porosité, vieillissement prématuré).
+    Points sensibles (obstacles) : %s — explique leur impact (pénétrations, joints, zones à risque d’infiltration ou de mousse).
+    Signes de détérioration : fissures = "%s" ; risque feu = "%s" — interprète le contexte (zones à forte exposition, végétation proche, matériaux inflammables, etc.).
+    FIN_INSTRUCTION
+
+    <ul>
+      <li>INSTRUCTION: en commençant par une phrase similaire à "L'analyse a montré que", fais une analyse générale en montrant le constat, la cause et la conséquence en utilisant les données ci-dessus. FIN_INSTRUCTION</li>
+    </ul>
+
+    <ul>
+      <li>INSTRUCTION: indique le type de toiture, l’humidité et le taux d’usure. FIN_INSTRUCTION</li>
+      <li>INSTRUCTION: fais une analyse des données de l’instruction précédente en expliquant leur impact. FIN_INSTRUCTION</li>
+    </ul>
 """,
                         toit.surfaceEnM2(),
                         toit.penteMin(),
@@ -82,11 +91,11 @@ Ton objectif est double :
                     String.format(
                         """
 <ul>
-  <li>🔍 Inspection ciblée : recommander les zones à vérifier (ex. autour de %s, pentes faibles, angles rentrants, zones d’accumulation d’eau ou de mousse).</li>
-  <li>🧼 Entretien recommandé : nettoyage préventif (mousses, lichens), curage des évacuations, élimination des dépôts pouvant accélérer l’usure ou l’humidité.</li>
-  <li>🛠️ Travaux à envisager : lister les réparations concrètes (ex. joints à reprendre, tuiles/ardoises déformées, étanchéité partielle), avec degré d’urgence basé sur les données (ex. %s %%, %s %%).</li>
-  <li>📸 Suivi : recommander un rythme de contrôle (visuel / drone / thermique) selon la catégorie (C/D/E → semestriel, A/B → annuel), pour anticiper au lieu de subir.</li>
-  <li>🧪 Vérifications complémentaires : proposer des tests adaptés (ex. arrosage ciblé, caméra thermique, vérification du dimensionnement des évacuations selon pente).</li>
+  <li>🔍 Inspection ciblée : INSTRUCTION: recommander les zones à vérifier (ex. autour de %s, pentes faibles, angles rentrants, zones d’accumulation d’eau ou de mousse). FIN_INSTRUCTION</li>
+  <li>🧼 Entretien recommandé : INSTRUCTION: nettoyage préventif (mousses, lichens), curage des évacuations, élimination des dépôts pouvant accélérer l’usure ou l’humidité. FIN_INSTRUCTION</li>
+  <li>🛠️ Travaux à envisager : INSTRUCTION: lister les réparations concrètes (ex. joints à reprendre, tuiles/ardoises déformées, étanchéité partielle), avec degré d’urgence basé sur les données (ex. %s %%, %s %%).FIN_INSTRUCTION</li>
+  <li>📸 Suivi : INSTRUCTION: recommander un rythme de contrôle (visuel / drone / thermique) selon la catégorie (C/D/E → semestriel, A/B → annuel), pour anticiper au lieu de subir. FIN_INSTRUCTION</li>
+  <li>🧪 Vérifications complémentaires : INSTRUCTION: proposer des tests adaptés (ex. arrosage ciblé, caméra thermique, vérification du dimensionnement des évacuations selon pente). FIN_INSTRUCTION</li>
 </ul>
 """,
                         toit.obstacles(), toit.usure() * 100, toit.humidité() * 100))
@@ -94,6 +103,7 @@ Ton objectif est double :
                     """
 </section>
 
+INSTRUCTION
 🔁 Logique d’analyse attendue :
 	•	Si le revêtement est poreux (ex. tuiles béton, anciennes ardoises), commente plus l’humidité/moisissure.
 	•	Si pente <10°, alerte sur évacuations et zones de stagnation.
@@ -101,6 +111,7 @@ Ton objectif est double :
 	•	Si taux d’usure élevé (>30 %%), recommande interventions ciblées ou révision complète selon les cas.
 	•	Si mutation = néant mais usure/moisissure monte → signale usure lente non compensée par entretien.
 	•	Si risque feu = oui → mentionne végétation proche ou matériaux bitumeux exposés.
+FIN_INSTRUCTION
 """))
         .replace("```html", "")
         .replace("```", "");
