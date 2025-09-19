@@ -78,9 +78,9 @@ Ton objectif est double :
                         toit.penteMin(),
                         toit.penteMax(),
                         toit.revetement(),
-                        toit.humidité() * 100,
-                        toit.moisissure() * 100,
-                        toit.usure() * 100,
+                        toit.humidité(),
+                        toit.moisissure(),
+                        toit.usure(),
                         toit.obstacles(),
                         toit.fissureCassure() ? "OUI" : "NON",
                         toit.risqueFeu() ? "OUI" : "NON"))
@@ -101,7 +101,7 @@ Ton objectif est double :
   <li>🧪 Vérifications complémentaires : INSTRUCTION: proposer des tests adaptés (ex. arrosage ciblé, caméra thermique, vérification du dimensionnement des évacuations selon pente). FIN_INSTRUCTION</li>
 </ul>
 """,
-                        toit.obstacles(), toit.usure() * 100, toit.humidité() * 100))
+                        toit.obstacles(), toit.usure(), toit.humidité()))
                 .concat(
                     """
 </section>
