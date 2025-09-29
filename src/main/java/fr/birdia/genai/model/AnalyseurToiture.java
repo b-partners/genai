@@ -50,8 +50,12 @@ Ton objectif est double :
 
 <section>
   <h2>COMPRENDRE VOTRE RAPPORT</h2>
-  <h3><span>{{pastille_emoji}}</span> CATÉGORIE {{lettre}} : {{etat_toiture}}</h3>
 """
+                .concat(
+                    String.format(
+                        """
+                        <h3><span>{{pastille_emoji}}</span> CATÉGORIE %s : %s</h3>""",
+                        getCategory(toit), getEtatToiture(toit)))
                 .concat(
                     String.format(
                         """
@@ -118,5 +122,38 @@ FIN_INSTRUCTION
 """))
         .replace("```html", "")
         .replace("```", "");
+  }
+
+  private String getCategory(Toit toit) {
+    var categoryFromConsumer = toit.category();
+    if (categoryFromConsumer == null || categoryFromConsumer.isEmpty()) {
+      var globalRate = toit.noteDegradationGlobale();
+      if (globalRate < 8) {
+        return "A";
+      }
+      if (globalRate >= 8 && globalRate < 20) {
+        return "B";
+      }
+      if (globalRate >= 20 && globalRate < 30) {
+        return "C";
+      }
+      if (globalRate >= 30 && globalRate < 40) {
+        return "D";
+      }
+      return "E";
+    }
+    return categoryFromConsumer;
+  }
+
+  private String getEtatToiture(Toit toit) {
+    var category = getCategory(toit);
+    return switch (category) {
+      case "A" -> "Excellent état général";
+      case "B" -> "Bon état avec légères réparations à prévoir";
+      case "C" -> "État moyen, entretien recommandé rapidement";
+      case "D" -> "Mauvais état, réparations importantes nécessaires";
+      case "E" -> "Très mauvais état, rénovation complète recommandée";
+      default -> throw new IllegalStateException("Unexpected value: " + category);
+    };
   }
 }

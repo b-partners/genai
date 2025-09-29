@@ -33,7 +33,8 @@ public class RoofController {
       @RequestParam(required = false) String mutation,
       @RequestParam(required = false) Boolean fissureCassure,
       @RequestParam(required = false) Boolean risqueFeu,
-      @RequestParam(required = false) Double noteDegradationGlobale) {
+      @RequestParam(required = false) Double noteDegradationGlobale,
+      @RequestParam(required = false) String categorie) {
 
     return analyseurToiture.apply(
         new Toit(
@@ -53,6 +54,7 @@ public class RoofController {
             mutation,
             fissureCassure,
             risqueFeu,
-            noteDegradationGlobale));
+            noteDegradationGlobale,
+            categorie));
   }
 }
