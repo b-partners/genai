@@ -64,8 +64,8 @@ Ton objectif est double :
 
     Voici les donnée à utiliser:
 
-    L’analyse couvre %s m² (pente %s°–%s°). Revêtement : %s.
-    Humidité : %s %% • Moisissure : %s %% • Usure : %s %% — interprète leur impact selon le type de revêtement et la pente (ex. stagnation, porosité, vieillissement prématuré).
+    L’analyse couvre %s m². Revêtement : %s.
+    Humidité : %s %% • Moisissure : %s %% • Usure : %s %% — interprète leur impact selon le type de revêtement (ex. stagnation, porosité, vieillissement prématuré).
     Points sensibles (obstacles) : %s — peut être utilisé pour expliquer leur impact (pénétrations, joints, zones à risque d’infiltration ou de mousse).
     Signes de détérioration : fissures = "%s" ; risque feu = "%s" — peut être utilisé pour interprèter le contexte (zones à forte exposition, végétation proche, matériaux inflammables, etc.).
     FIN_INSTRUCTION
@@ -79,8 +79,6 @@ Ton objectif est double :
     </ul>
 """,
                         toit.surfaceEnM2(),
-                        toit.penteMin(),
-                        toit.penteMax(),
                         toit.revetement(),
                         toit.humidité(),
                         toit.moisissure(),
@@ -98,11 +96,11 @@ Ton objectif est double :
                     String.format(
                         """
 <ul>
-  <li>🔍 Inspection ciblée : INSTRUCTION: recommander les zones à vérifier (ex. autour de %s, pentes faibles, angles rentrants, zones d’accumulation d’eau ou de mousse). FIN_INSTRUCTION</li>
+  <li>🔍 Inspection ciblée : INSTRUCTION: recommander les zones à vérifier (ex. autour de %s, angles rentrants, zones d’accumulation d’eau ou de mousse). FIN_INSTRUCTION</li>
   <li>🧼 Entretien recommandé : INSTRUCTION: nettoyage préventif (mousses, lichens), curage des évacuations, élimination des dépôts pouvant accélérer l’usure ou l’humidité. FIN_INSTRUCTION</li>
   <li>🛠️ Travaux à envisager : INSTRUCTION: lister les réparations concrètes (ex. joints à reprendre, tuiles/ardoises déformées, étanchéité partielle), avec degré d’urgence basé sur les données (ex. %s %%, %s %%).FIN_INSTRUCTION</li>
   <li>📸 Suivi : INSTRUCTION: recommander un rythme de contrôle (visuel / drone / thermique) selon la catégorie (C/D/E → semestriel, A/B → annuel), pour anticiper au lieu de subir. FIN_INSTRUCTION</li>
-  <li>🧪 Vérifications complémentaires : INSTRUCTION: proposer des tests adaptés (ex. arrosage ciblé, caméra thermique, vérification du dimensionnement des évacuations selon pente). FIN_INSTRUCTION</li>
+  <li>🧪 Vérifications complémentaires : INSTRUCTION: proposer des tests adaptés (ex. arrosage ciblé, caméra thermique). FIN_INSTRUCTION</li>
 </ul>
 """,
                         toit.obstacles(), toit.usure(), toit.humidité()))
@@ -113,7 +111,6 @@ Ton objectif est double :
 INSTRUCTION
 🔁 Logique d’analyse attendue :
 	•	Si le revêtement est poreux (ex. tuiles béton, anciennes ardoises), commente plus l’humidité/moisissure.
-	•	Si pente <10°, alerte sur évacuations et zones de stagnation.
 	•	Si obstacles présents, insiste sur étanchéité périphérique.
 	•	Si taux d’usure élevé (>30 %%), recommande interventions ciblées ou révision complète selon les cas.
 	•	Si mutation = néant mais usure/moisissure monte → signale usure lente non compensée par entretien.
