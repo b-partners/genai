@@ -54,8 +54,8 @@ Ton objectif est double :
                 .concat(
                     String.format(
                         """
-                        <h3><span>{{pastille_emoji}}</span> CATÉGORIE %s : %s</h3>""",
-                        getCategory(toit), getEtatToiture(toit)))
+                        <h3><span>%s</span> CATÉGORIE %s : %s</h3>""",
+                        getCategoryEmoji(toit), getCategory(toit), getEtatToiture(toit)))
                 .concat(
                     String.format(
                         """
@@ -119,6 +119,17 @@ FIN_INSTRUCTION
 """))
         .replace("```html", "")
         .replace("```", "");
+  }
+
+  private String getCategoryEmoji(Toit toit) {
+    var category = getCategory(toit);
+    return switch (category) {
+      case "A" -> "🟢";
+      case "B", "C" -> "🟡";
+      case "D" -> "🟠";
+      case "E" -> "🔴";
+      default -> throw new IllegalStateException("Unexpected value: " + category);
+    };
   }
 
   private String getCategory(Toit toit) {
