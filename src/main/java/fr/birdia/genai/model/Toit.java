@@ -17,4 +17,5 @@ public record Toit(
     String mutation,
     Boolean fissureCassure,
     Boolean risqueFeu,
-    Double noteDegradationGlobale) {}
+    Double noteDegradationGlobale,
+    String category) {}
