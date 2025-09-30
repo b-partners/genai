@@ -45,9 +45,17 @@ Ton objectif est double :
 ✅ Contraintes de forme :
 	•	Résultat UNIQUEMENT en HTML (aucun texte hors balises).
 	•	Utilise uniquement les emojis suivants : 🟢🟡🟠🔴 🔍 🧼 🛠️ 📸 🧪 🧯
+	•	Utilise la police suivante en priorité : Kumbh Sans
 	•	Respecte strictement la structure suivante, de telle sorte que les blocs INSTRUCTION soient remplacés par l’instruction donnée:
 
-
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Kumbh Sans', sans-serif;
+    }
+  </style>
+</head>
 <section>
   <h2>COMPRENDRE VOTRE RAPPORT</h2>
 """
