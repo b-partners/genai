@@ -28,103 +28,104 @@ public class AnalyseurToiture implements Function<Toit, String> {
   }
 
   private String getAIReport(Toit toit) {
-    return chat.apply(
+    var prompt = """
+            Tu es un artisan couvreur expérimenté, spécialiste des toitures depuis plus de 15 ans.
+            Tu rédiges un rapport court (300–400 mots max), clair, professionnel et pédagogique pour un propriétaire non-expert.
+            Ton objectif est double :
+            	1.	Expliquer factuellement l’état de la toiture en croisant les données techniques, les types de matériaux et les points sensibles.
+            	2.	Formuler des conseils concrets et actionnables pour maintenir ou prolonger la durée de vie de la toiture, en te projetant comme si tu préparais un devis pour de vraies interventions à réaliser à court ou moyen terme.
+            
+            🛑 Interdictions :
+            	•	Ne fais aucun disclaimer juridique.
+            	•	Ne dépasse jamais 400 mots.
+            	•	Ne parle jamais d’argent.
+            	•	Ne répète pas les données brutes : interprète-les.
+            
+            ✅ Contraintes de forme :
+            	•	Résultat UNIQUEMENT en HTML (aucun texte hors balises).
+            	•	Utilise uniquement les emojis suivants : 🟢🟡🟠🔴 🔍 🧼 🛠️ 📸 🧪 🧯
+            	•	Utilise la police suivante en priorité : Kumbh Sans
+            	•	Respecte strictement la structure suivante, de telle sorte que les blocs INSTRUCTION soient remplacés par l’instruction donnée:
+            
+            <head>
+              <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;700&display=swap" rel="stylesheet">
+              <style>
+                body {
+                  font-family: 'Kumbh Sans', sans-serif;
+                }
+              </style>
+            </head>
+            <section>
+              <h2>COMPRENDRE VOTRE RAPPORT</h2>
             """
-Tu es un artisan couvreur expérimenté, spécialiste des toitures depuis plus de 15 ans.
-Tu rédiges un rapport court (300–400 mots max), clair, professionnel et pédagogique pour un propriétaire non-expert.
-Ton objectif est double :
-	1.	Expliquer factuellement l’état de la toiture en croisant les données techniques, les types de matériaux et les points sensibles.
-	2.	Formuler des conseils concrets et actionnables pour maintenir ou prolonger la durée de vie de la toiture, en te projetant comme si tu préparais un devis pour de vraies interventions à réaliser à court ou moyen terme.
-
-🛑 Interdictions :
-	•	Ne fais aucun disclaimer juridique.
-	•	Ne dépasse jamais 400 mots.
-	•	Ne parle jamais d’argent.
-	•	Ne répète pas les données brutes : interprète-les.
-
-✅ Contraintes de forme :
-	•	Résultat UNIQUEMENT en HTML (aucun texte hors balises).
-	•	Utilise uniquement les emojis suivants : 🟢🟡🟠🔴 🔍 🧼 🛠️ 📸 🧪 🧯
-	•	Utilise la police suivante en priorité : Kumbh Sans
-	•	Respecte strictement la structure suivante, de telle sorte que les blocs INSTRUCTION soient remplacés par l’instruction donnée:
-
-<head>
-  <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Kumbh Sans', sans-serif;
-    }
-  </style>
-</head>
-<section>
-  <h2>COMPRENDRE VOTRE RAPPORT</h2>
-"""
-                .concat(
+            .concat(
                     String.format(
-                        """
-                        <h3><span>%s</span> CATÉGORIE %s : %s</h3>""",
-                        getCategoryEmoji(toit), getCategory(toit), getEtatToiture(toit)))
-                .concat(
+                            """
+                                    <h3><span>%s</span> CATÉGORIE %s : %s</h3>""",
+                            getCategoryEmoji(toit), getCategory(toit), getEtatToiture(toit)))
+            .concat(
                     String.format(
-                        """
-    INSTRUCTION
-    !IMPORTANT! Cette instruction n'est pas à afficher.
-
-    Voici les donnée à utiliser:
-
-    L’analyse couvre %s m². Revêtement : %s.
-    Humidité : %s %% • Moisissure : %s %% • Usure : %s %% — interprète leur impact selon le type de revêtement (ex. stagnation, porosité, vieillissement prématuré).
-    Points sensibles (obstacles) : %s — peut être utilisé pour expliquer leur impact (pénétrations, joints, zones à risque d’infiltration ou de mousse).
-    Signes de détérioration : fissures = "%s" ; risque feu = "%s" — peut être utilisé pour interprèter le contexte (zones à forte exposition, végétation proche, matériaux inflammables, etc.).
-    FIN_INSTRUCTION
-
-    <ul>
-      <li>INSTRUCTION: en commençant par une phrase similaire à "L'analyse a montré que", fais une analyse générale en montrant le constat, la cause et la conséquence en utilisant les données ci-dessus. FIN_INSTRUCTION</li>
-    </ul>
-
-    <ul>
-      <li>INSTRUCTION: fais une analyse des données concernant le type de toiture, l'humidité et le taux d'usure, en expliquant leur impact. FIN_INSTRUCTION</li>
-    </ul>
-""",
-                        toit.surfaceEnM2(),
-                        toit.revetement(),
-                        toit.humidité(),
-                        toit.moisissure(),
-                        toit.usure(),
-                        toit.obstacles(),
-                        toit.fissureCassure() ? "OUI" : "NON",
-                        toit.risqueFeu() ? "OUI" : "NON"))
-                .concat(
+                            """
+                                        INSTRUCTION
+                                        !IMPORTANT! Cette instruction n'est pas à afficher.
+                                    
+                                        Voici les donnée à utiliser:
+                                    
+                                        L’analyse couvre %s m². Revêtement : %s.
+                                        Humidité : %s %% • Moisissure : %s %% • Usure : %s %% — interprète leur impact selon le type de revêtement (ex. stagnation, porosité, vieillissement prématuré).
+                                        Points sensibles (obstacles) : %s — peut être utilisé pour expliquer leur impact (pénétrations, joints, zones à risque d’infiltration ou de mousse).
+                                        Signes de détérioration : fissures = "%s" ; risque feu = "%s" — peut être utilisé pour interprèter le contexte (zones à forte exposition, végétation proche, matériaux inflammables, etc.).
+                                        FIN_INSTRUCTION
+                                    
+                                        <ul>
+                                          <li>INSTRUCTION: en commençant par une phrase similaire à "L'analyse a montré que", fais une analyse générale en montrant le constat, la cause et la conséquence en utilisant les données ci-dessus. FIN_INSTRUCTION</li>
+                                        </ul>
+                                    
+                                        <ul>
+                                          <li>INSTRUCTION: fais une analyse des données concernant le type de toiture, l'humidité et le taux d'usure, en expliquant leur impact. FIN_INSTRUCTION</li>
+                                        </ul>
+                                    """,
+                            toit.surfaceEnM2(),
+                            toit.revetement(),
+                            toit.humidité(),
+                            toit.moisissure(),
+                            toit.usure(),
+                            toit.obstacles(),
+                            toit.fissureCassure() ? "OUI" : "NON",
+                            toit.risqueFeu() ? "OUI" : "NON"))
+            .concat(
                     """
-</section>
-<section>
-  <h2>CONSEILS DE L’ARTISAN COUVREUR</h2>
-""")
-                .concat(
+                            </section>
+                            <section>
+                              <h2>CONSEILS DE L’ARTISAN COUVREUR</h2>
+                            """)
+            .concat(
                     String.format(
-                        """
-<ul>
-  <li>🔍 Inspection ciblée : INSTRUCTION: recommander les zones à vérifier (ex. autour de %s, angles rentrants, zones d’accumulation d’eau ou de mousse). FIN_INSTRUCTION</li>
-  <li>🧼 Entretien recommandé : INSTRUCTION: nettoyage préventif (mousses, lichens), curage des évacuations, élimination des dépôts pouvant accélérer l’usure ou l’humidité. FIN_INSTRUCTION</li>
-  <li>🛠️ Travaux à envisager : INSTRUCTION: lister les réparations concrètes (ex. joints à reprendre, tuiles/ardoises déformées, étanchéité partielle), avec degré d’urgence basé sur les données (ex. %s %%, %s %%).FIN_INSTRUCTION</li>
-  <li>📸 Suivi : INSTRUCTION: recommander un rythme de contrôle (visuel / drone / thermique) selon la catégorie (C/D/E → semestriel, A/B → annuel), pour anticiper au lieu de subir. FIN_INSTRUCTION</li>
-  <li>🧪 Vérifications complémentaires : INSTRUCTION: proposer des tests adaptés (ex. arrosage ciblé, caméra thermique). FIN_INSTRUCTION</li>
-</ul>
-""",
-                        toit.obstacles(), toit.usure(), toit.humidité()))
-                .concat(
+                            """
+                                    <ul>
+                                      <li>🔍 Inspection ciblée : INSTRUCTION: recommander les zones à vérifier (ex. autour de %s, angles rentrants, zones d’accumulation d’eau ou de mousse). FIN_INSTRUCTION</li>
+                                      <li>🧼 Entretien recommandé : INSTRUCTION: nettoyage préventif (mousses, lichens), curage des évacuations, élimination des dépôts pouvant accélérer l’usure ou l’humidité. FIN_INSTRUCTION</li>
+                                      <li>🛠️ Travaux à envisager : INSTRUCTION: lister les réparations concrètes (ex. joints à reprendre, tuiles/ardoises déformées, étanchéité partielle), avec degré d’urgence basé sur les données (ex. %s %%, %s %%).FIN_INSTRUCTION</li>
+                                      <li>📸 Suivi : INSTRUCTION: recommander un rythme de contrôle (visuel / drone / thermique) selon la catégorie (C/D/E → semestriel, A/B → annuel), pour anticiper au lieu de subir. FIN_INSTRUCTION</li>
+                                      <li>🧪 Vérifications complémentaires : INSTRUCTION: proposer des tests adaptés (ex. arrosage ciblé, caméra thermique). FIN_INSTRUCTION</li>
+                                    </ul>
+                                    """,
+                            toit.obstacles(), toit.usure(), toit.humidité()))
+            .concat(
                     """
-</section>
-
-INSTRUCTION
-🔁 Logique d’analyse attendue :
-	•	Si le revêtement est poreux (ex. tuiles béton, anciennes ardoises), commente plus l’humidité/moisissure.
-	•	Si obstacles présents, insiste sur étanchéité périphérique.
-	•	Si taux d’usure élevé (>30 %%), recommande interventions ciblées ou révision complète selon les cas.
-	•	Si mutation = néant mais usure/moisissure monte → signale usure lente non compensée par entretien.
-	•	Si risque feu = oui → mentionne végétation proche ou matériaux bitumeux exposés.
-FIN_INSTRUCTION
-"""))
+                            </section>
+                            
+                            INSTRUCTION
+                            🔁 Logique d’analyse attendue :
+                            	•	Si le revêtement est poreux (ex. tuiles béton, anciennes ardoises), commente plus l’humidité/moisissure.
+                            	•	Si obstacles présents, insiste sur étanchéité périphérique.
+                            	•	Si taux d’usure élevé (>30 %%), recommande interventions ciblées ou révision complète selon les cas.
+                            	•	Si mutation = néant mais usure/moisissure monte → signale usure lente non compensée par entretien.
+                            	•	Si risque feu = oui → mentionne végétation proche ou matériaux bitumeux exposés.
+                            FIN_INSTRUCTION
+                            """);
+    log.info("AI Prompt : {}", prompt);
+    return chat.apply(prompt)
         .replace("```html", "")
         .replace("```", "");
   }
