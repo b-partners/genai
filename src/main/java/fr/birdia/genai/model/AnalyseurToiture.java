@@ -145,16 +145,16 @@ public class AnalyseurToiture implements Function<Toit, String> {
     var categoryFromConsumer = toit.category();
     if (categoryFromConsumer == null || categoryFromConsumer.isEmpty()) {
       var globalRate = toit.noteDegradationGlobale();
-      if (globalRate < 8) {
+      if (globalRate < 4) {
         return "A";
       }
-      if (globalRate >= 8 && globalRate < 20) {
+      if (globalRate >= 4 && globalRate < 11) {
         return "B";
       }
-      if (globalRate >= 20 && globalRate < 30) {
+      if (globalRate >= 11 && globalRate < 21) {
         return "C";
       }
-      if (globalRate >= 30 && globalRate < 40) {
+      if (globalRate >= 21 && globalRate < 41) {
         return "D";
       }
       return "E";
@@ -165,11 +165,11 @@ public class AnalyseurToiture implements Function<Toit, String> {
   private String getEtatToiture(Toit toit) {
     var category = getCategory(toit);
     return switch (category) {
-      case "A" -> "Excellent état général";
-      case "B" -> "Bon état avec légères réparations à prévoir";
-      case "C" -> "État moyen, entretien recommandé rapidement";
-      case "D" -> "Mauvais état, réparations importantes nécessaires";
-      case "E" -> "Très mauvais état, rénovation complète recommandée";
+      case "A" -> "Bon état, RAS";
+      case "B" -> "Entretien à prévoir";
+      case "C" -> "Entretien nécessaire";
+      case "D" -> "Réparation nécessaire";
+      case "E" -> "Intervention urgente";
       default -> throw new IllegalStateException("Unexpected value: " + category);
     };
   }
