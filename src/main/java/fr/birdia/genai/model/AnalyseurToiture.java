@@ -92,10 +92,13 @@ public class AnalyseurToiture implements Function<Toit, String> {
                                     
                                         Voici les donnée à utiliser:
                                     
-                                        L’analyse couvre %s m². Revêtement : %s.
+                                        L’analyse couvre %s m². Revêtement : %s. Revêtement 2 : %s
                                         Humidité : %s %% • Moisissure : %s %% • Usure : %s %% — interprète leur impact selon le type de revêtement (ex. stagnation, porosité, vieillissement prématuré).
                                         Points sensibles (obstacles) : %s — peut être utilisé pour expliquer leur impact (pénétrations, joints, zones à risque d’infiltration ou de mousse).
                                         Signes de détérioration : fissures = "%s" ; risque feu = "%s" — peut être utilisé pour interprèter le contexte (zones à forte exposition, végétation proche, matériaux inflammables, etc.).
+                                        Hauteur Bâtiment: %s .
+                                        Commentaire couvreur : "%s " .
+                                    
                                         FIN_INSTRUCTION
                                     
                                         <ul>
@@ -108,12 +111,15 @@ public class AnalyseurToiture implements Function<Toit, String> {
                                     """,
                             toit.surfaceEnM2(),
                             toit.revetement(),
+                            toit.revetement2(),
                             toit.humidité(),
                             toit.moisissure(),
                             toit.usure(),
                             toit.obstacles(),
                             toit.fissureCassure() ? "OUI" : "NON",
-                            toit.risqueFeu() ? "OUI" : "NON"))
+                            toit.risqueFeu() ? "OUI" : "NON",
+                            toit.hauteurBatiment(),
+                            toit.commentaireCouvreur()))
             .concat(
                     """
                             </section>
