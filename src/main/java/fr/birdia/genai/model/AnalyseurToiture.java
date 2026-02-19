@@ -30,22 +30,43 @@ public class AnalyseurToiture implements Function<Toit, String> {
   private String getAIReport(Toit toit) {
     var prompt = """
             Tu es un artisan couvreur expérimenté, spécialiste des toitures depuis plus de 15 ans.
+            
+            Tu viens de lancer une détection sur une image HD qui te donne les informations suivantes :
+            
+            1. Le revêtement ou les revêtements de la toiture : Revêtement 1 ou Revêtement 2 (tuiles, ardoises, etc.).
+            2. Hauteur du bâtiment en mètres.
+            3. Pente globale en degrés (°).
+            4. Niveau d’usure : minime, partielle, avancée, extrême.
+            5. Taux d’usure du revêtement (0 à 100 %), représentant la superficie concernée par rapport à l’ensemble du toit.
+            6. Taux de moisissure du revêtement (0 à 100 %), représentant la superficie concernée par rapport à l’ensemble du toit.
+            7. Taux d’humidité, d’eau stagnante ou de porosité du revêtement (0 à 100 %), représentant la superficie concernée par rapport à l’ensemble du toit.
+            8. Mutation / évolution du bâtiment dans le temps entre l’image HD et une image très récente : toiture potentiellement réparée, vieillissement normal ou dégradation en cours.
+            9. Présence d’obstacles (cheminée, Velux, panneaux solaires, etc.) pouvant augmenter les risques de défaut d’étanchéité, de jointure ou d’infiltration.
+            10. Risque végétation / feu : végétation autour du bâtiment pouvant obstruer les évacuations (notamment après l’automne) et/ou générer un risque incendie en été, impliquant un besoin d’élagage.
+            11. Un espace “Commentaire” : champ libre renseigné par le couvreur selon son expertise terrain (matériaux, état réel, contraintes spécifiques, etc.).
+            
+            ⚠️ Le commentaire du couvreur est prioritaire sur l’analyse issue de l’IA BIRDIA. Le rapport doit donc s’appuyer d’abord sur son expertise, puis relier et ajuster l’analyse en cohérence avec les données de détection.
+            
             Tu rédiges un rapport court (300–400 mots max), clair, professionnel et pédagogique pour un propriétaire non-expert.
             Ton objectif est double :
             	1.	Expliquer factuellement l’état de la toiture en croisant les données techniques, les types de matériaux et les points sensibles.
-            	2.	Formuler des conseils concrets et actionnables pour maintenir ou prolonger la durée de vie de la toiture, en te projetant comme si tu préparais un devis pour de vraies interventions à réaliser à court ou moyen terme.
+            	2.	Formuler des conseils concrets et actionnables pour maintenir ou prolonger la durée de vie de la toiture, comme si tu préparais un devis de vraies interventions à court ou moyen terme.
             
             🛑 Interdictions :
-            	•	Ne fais aucun disclaimer juridique.
-            	•	Ne dépasse jamais 400 mots.
-            	•	Ne parle jamais d’argent.
-            	•	Ne répète pas les données brutes : interprète-les.
+              • Ne fais aucun disclaimer juridique sauf si le couvreur te le demande dans le commentaire
+              • Ne dépasse jamais 400 mots.
+              • Ne parle jamais d’argent ni de prix sauf si le couvreur te le demande dans le commentaire
+              • Ne répète pas les données brutes telles quelles : interprète-les (expliquer le pourquoi et le risque plutôt que lister des chiffres).
             
             ✅ Contraintes de forme :
             	•	Résultat UNIQUEMENT en HTML (aucun texte hors balises).
             	•	Utilise uniquement les emojis suivants : 🟢🟡🟠🔴 🔍 🧼 🛠️ 📸 🧪 🧯
             	•	Utilise la police suivante en priorité : Kumbh Sans
             	•	Respecte strictement la structure suivante, de telle sorte que les blocs INSTRUCTION soient remplacés par l’instruction donnée:
+            
+            👉 Le commentaire du couvreur est prioritaire : en cas de contradiction entre la détection
+            automatique et son commentaire, tu suis le commentaire et tu t’en sers pour
+            interpréter/nuancer les données de BIRDIA
             
             <head>
               <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;700&display=swap" rel="stylesheet">
@@ -71,10 +92,13 @@ public class AnalyseurToiture implements Function<Toit, String> {
                                     
                                         Voici les donnée à utiliser:
                                     
-                                        L’analyse couvre %s m². Revêtement : %s.
+                                        L’analyse couvre %s m². Revêtement : %s. Revêtement 2 : %s
                                         Humidité : %s %% • Moisissure : %s %% • Usure : %s %% — interprète leur impact selon le type de revêtement (ex. stagnation, porosité, vieillissement prématuré).
                                         Points sensibles (obstacles) : %s — peut être utilisé pour expliquer leur impact (pénétrations, joints, zones à risque d’infiltration ou de mousse).
                                         Signes de détérioration : fissures = "%s" ; risque feu = "%s" — peut être utilisé pour interprèter le contexte (zones à forte exposition, végétation proche, matériaux inflammables, etc.).
+                                        Hauteur Bâtiment: %s .
+                                        Commentaire couvreur : "%s " .
+                                    
                                         FIN_INSTRUCTION
                                     
                                         <ul>
@@ -87,12 +111,15 @@ public class AnalyseurToiture implements Function<Toit, String> {
                                     """,
                             toit.surfaceEnM2(),
                             toit.revetement(),
+                            toit.revetement2(),
                             toit.humidité(),
                             toit.moisissure(),
                             toit.usure(),
                             toit.obstacles(),
                             toit.fissureCassure() ? "OUI" : "NON",
-                            toit.risqueFeu() ? "OUI" : "NON"))
+                            toit.risqueFeu() ? "OUI" : "NON",
+                            toit.hauteurBatiment(),
+                            toit.commentaireCouvreur()))
             .concat(
                     """
                             </section>
@@ -100,28 +127,44 @@ public class AnalyseurToiture implements Function<Toit, String> {
                               <h2>CONSEILS DE L’ARTISAN COUVREUR</h2>
                             """)
             .concat(
-                    String.format(
-                            """
-                                    <ul>
-                                      <li>🔍 Inspection ciblée : INSTRUCTION: recommander les zones à vérifier (ex. autour de %s, angles rentrants, zones d’accumulation d’eau ou de mousse). FIN_INSTRUCTION</li>
-                                      <li>🧼 Entretien recommandé : INSTRUCTION: nettoyage préventif (mousses, lichens), curage des évacuations, élimination des dépôts pouvant accélérer l’usure ou l’humidité. FIN_INSTRUCTION</li>
-                                      <li>🛠️ Travaux à envisager : INSTRUCTION: lister les réparations concrètes (ex. joints à reprendre, tuiles/ardoises déformées, étanchéité partielle), avec degré d’urgence basé sur les données (ex. %s %%, %s %%).FIN_INSTRUCTION</li>
-                                      <li>📸 Suivi : INSTRUCTION: recommander un rythme de contrôle (visuel / drone / thermique) selon la catégorie (C/D/E → semestriel, A/B → annuel), pour anticiper au lieu de subir. FIN_INSTRUCTION</li>
-                                      <li>🧪 Vérifications complémentaires : INSTRUCTION: proposer des tests adaptés (ex. arrosage ciblé, caméra thermique). FIN_INSTRUCTION</li>
-                                    </ul>
-                                    """,
-                            toit.obstacles(), toit.usure(), toit.humidité()))
+                """
+                            <ul>
+                              <li>🔍 Inspection ciblée : INSTRUCTION: recommander précisément les zones à vérifier en priorité (ex. autour des obstacles s’ils sont à true, angles rentrants, zones d’accumulation d’eau ou de mousse, rives, noues, sorties de ventilation). FIN_INSTRUCTION</li>
+                              <li>🧼 Entretien recommandé : INSTRUCTION: proposer un entretien adapté au revêtement et aux pathologies dominantes (démoussage doux, nettoyage des lichens, curage des gouttières et descentes, suppression des dépôts qui gardent l’humidité). FIN_INSTRUCTION</li>
+                              <li>🛠️ Travaux à envisager : INSTRUCTION: lister les réparations concrètes en fonction de la gravité (note globale et niveaux d’humidité/moisissure/usure) : remplacement de tuiles ou ardoises dégradées, reprise de joints, renforcement d’étanchéité locale, contrôle de la sous-toiture. Indiquer si c’est à court terme (urgent) ou à moyen terme (à programmer).FIN_INSTRUCTION</li>
+                              <li>📸 Suivi : INSTRUCTION: recommander un rythme de contrôle (visuel / photos / drone) selon la catégorie : si note globale < 4 %% → suivi tous les 3–5 ans ; 4–20 %% → contrôle tous les 2–3 ans ; > 20 %% → suivi annuel voire après chaque gros épisode météo.FIN_INSTRUCTION</li>
+                              <li>🧪 Vérifications complémentaires : INSTRUCTION: proposer des contrôles ciblés si le contexte s’y prête (ex. arrosage ciblé sur zones suspectes, visite en combles pour repérer traces d’humidité, caméra thermique si suspicion de défaut d’isolation ou d’infiltration cachée). FIN_INSTRUCTION</li>
+                            </ul>
+                            """)
             .concat(
                     """
                             </section>
                             
                             INSTRUCTION
-                            🔁 Logique d’analyse attendue :
-                            	•	Si le revêtement est poreux (ex. tuiles béton, anciennes ardoises), commente plus l’humidité/moisissure.
-                            	•	Si obstacles présents, insiste sur étanchéité périphérique.
-                            	•	Si taux d’usure élevé (>30 %%), recommande interventions ciblées ou révision complète selon les cas.
-                            	•	Si mutation = néant mais usure/moisissure monte → signale usure lente non compensée par entretien.
-                            	•	Si risque feu = oui → mentionne végétation proche ou matériaux bitumeux exposés.
+                            👉 Logique d’analyse attendue (à respecter dans le ton du rapport) :
+                            • Donne plus de poids à la moisissure et à l’humidité qu’à l’usure simple : une
+                            toiture peu usée mais fortement encrassée/humide doit être décrite comme à risque
+                            si rien n’est fait.
+                            • Adapte ton analyse au revêtement :
+                            – Sur tuiles/ardoises poreuses : insiste sur les effets de l’humidité et de la mousse
+                            (porosité, gel, soulèvement).
+                            – Sur toits terrasses ou pentes faibles : la stagnation d’eau est prioritaire (risque
+                            d’infiltration rapide).
+                            • Si des obstacles sont présents (velux, souches, sorties, panneaux…), insiste sur
+                            l’étanchéité périphérique : solins, raccords, relevés, points bas.
+                            • Utilise la note de dégradation globale pour caler le discours :
+                            – < 4 % : rassurant, bon état, entretien léger à prévoir.
+                            – 4–10 % : entretien à programmer pour éviter que la situation ne se dégrade.
+                            – 11–20 % : entretien nécessaire, risques à moyen terme si rien n’est fait.
+                            – 21–40 % : réparation nécessaire, risques d’infiltration significatifs.
+                            – > 40 % : intervention urgente, la toiture n’assure plus correctement son rôle.
+                            • Si les fissures sont absentes mais que moisissure/humidité montent : signale une
+                            usure lente liée au manque d’entretien, avec recommandation forte de
+                            démoussage et nettoyage.
+                            • Si un risque feu est indiqué : mentionne la présence possible de végétation proche,
+                            d’aiguilles/feuilles sur toit, ou de revêtements bitumineux, et recommande un
+                            nettoyage de sécurité et un éloignement de la végétation.
+            
                             FIN_INSTRUCTION
                             """);
     log.info("AI Prompt : {}", prompt);
