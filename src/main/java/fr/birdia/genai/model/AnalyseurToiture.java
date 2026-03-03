@@ -102,11 +102,11 @@ public class AnalyseurToiture implements Function<Toit, String> {
                                         FIN_INSTRUCTION
                                     
                                         <ul>
-                                          <li>INSTRUCTION: en commençant par une phrase similaire à "L'analyse a montré que", fais une analyse générale en montrant le constat, la cause et la conséquence en utilisant les données ci-dessus. FIN_INSTRUCTION</li>
+                                          <li>INSTRUCTION: : en commençant par une phrase du type « L’analyse a montré que… », donne une vue d’ensemble : état global de la toiture, éléments rassurants, points d’alerte. Fais le lien entre revêtements, pente, hauteur du bâtiment et pathologies dominantes. Si le commentaire du couvreur précise un point important (ex. matériau exact, défaut connu, zone déjà réparée), intègre-le en priorité dans ton analyse. FIN_INSTRUCTION</li>
                                         </ul>
                                     
                                         <ul>
-                                          <li>INSTRUCTION: fais une analyse des données concernant le type de toiture, l'humidité et le taux d'usure, en expliquant leur impact. FIN_INSTRUCTION</li>
+                                          <li>INSTRUCTION: : analyse plus finement l’impact de l’humidité, de la moisissure et de l’usure sur la durée de vie de la couverture, en tenant compte du ou des revêtements. Si la mutation indique une dégradation ou une évolution rapide, signale que la situation empire dans le temps et qu’un entretien ou des travaux deviennent prioritaires. FIN_INSTRUCTION</li>
                                         </ul>
                                     """,
                             toit.surfaceEnM2(),
@@ -129,11 +129,11 @@ public class AnalyseurToiture implements Function<Toit, String> {
             .concat(
                 """
                             <ul>
-                              <li>🔍 Inspection ciblée : INSTRUCTION: recommander précisément les zones à vérifier en priorité (ex. autour des obstacles s’ils sont à true, angles rentrants, zones d’accumulation d’eau ou de mousse, rives, noues, sorties de ventilation). FIN_INSTRUCTION</li>
-                              <li>🧼 Entretien recommandé : INSTRUCTION: proposer un entretien adapté au revêtement et aux pathologies dominantes (démoussage doux, nettoyage des lichens, curage des gouttières et descentes, suppression des dépôts qui gardent l’humidité). FIN_INSTRUCTION</li>
-                              <li>🛠️ Travaux à envisager : INSTRUCTION: lister les réparations concrètes en fonction de la gravité (note globale et niveaux d’humidité/moisissure/usure) : remplacement de tuiles ou ardoises dégradées, reprise de joints, renforcement d’étanchéité locale, contrôle de la sous-toiture. Indiquer si c’est à court terme (urgent) ou à moyen terme (à programmer).FIN_INSTRUCTION</li>
-                              <li>📸 Suivi : INSTRUCTION: recommander un rythme de contrôle (visuel / photos / drone) selon la catégorie : si note globale < 4 %% → suivi tous les 3–5 ans ; 4–20 %% → contrôle tous les 2–3 ans ; > 20 %% → suivi annuel voire après chaque gros épisode météo.FIN_INSTRUCTION</li>
-                              <li>🧪 Vérifications complémentaires : INSTRUCTION: proposer des contrôles ciblés si le contexte s’y prête (ex. arrosage ciblé sur zones suspectes, visite en combles pour repérer traces d’humidité, caméra thermique si suspicion de défaut d’isolation ou d’infiltration cachée). FIN_INSTRUCTION</li>
+                              <li>🔍 Inspection ciblée : INSTRUCTION: recommander précisément les zones à vérifier en priorité (autour des obstacles, rives, noues, angles rentrants, points bas, relevés, zones de stagnation d’eau ou de mousse). Tient compte de la hauteur du bâtiment (sécurité, accessibilité) et du commentaire du couvreur si celui-ci signale une zone sensible.. FIN_INSTRUCTION</li>
+                              <li>🧼 Entretien recommandé : INSTRUCTION: ON: proposer un entretien adapté au ou aux revêtements et aux pathologies dominantes : démoussage doux, nettoyage des lichens, curage des gouttières et descentes, retrait des feuilles, branches ou débris pouvant boucher les évacuations. Si le risque végétation/feu est présent, insiste sur l’élagage et le nettoyage régulier. FIN_INSTRUCTION</li>
+                              <li>🛠️ Travaux à envisager : INSTRUCTION: ON: lister les réparations concrètes en fonction de la gravité (note globale, niveaux d’humidité/moisissure/usure, niveau d’usure qualitative). Exemple : remplacement de tuiles ou ardoises dégradées, reprise des solins, renforcement local de l’étanchéité, traitement d’une zone de terrasse à faible pente. Préciser ce qui est à court terme (prioritaire) et ce qui peut être planifié sur 1–3 ans. FIN_INSTRUCTION</li>
+                              <li>📸 Suivi : INSTRUCTION: recommander un rythme de contrôle (visuel / photos / drone) selon la catégorie et la mutation : si la toiture vieillit lentement et la note globale est faible (< 4 %), contrôle tous les 3–5 ans ; si l’encrassement ou l’humidité progressent (4–20 %), contrôle tous les 2–3 ans ; au-delà ( > 20 % ou mutation dégradée), suivi annuel voire après chaque gros épisode météo..FIN_INSTRUCTION</li>
+                              <li>🧪 Vérifications complémentaires : INSTRUCTION: ON: proposer, si pertinent, des contrôles ciblés : visite des combles, tests d’arrosage localisés, caméra thermique, ou contrôle après travaux récents. FIN_INSTRUCTION</li>
                             </ul>
                             """)
             .concat(
