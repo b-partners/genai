@@ -141,30 +141,30 @@ public class AnalyseurToiture implements Function<Toit, String> {
                             </section>
                             
                             INSTRUCTION
-                            👉 Logique d’analyse attendue (à respecter dans le ton du rapport) :
+                            Logique d’analyse attendue :
                             • Donne plus de poids à la moisissure et à l’humidité qu’à l’usure simple : une
-                            toiture peu usée mais fortement encrassée/humide doit être décrite comme à risque
-                            si rien n’est fait.
-                            • Adapte ton analyse au revêtement :
-                            – Sur tuiles/ardoises poreuses : insiste sur les effets de l’humidité et de la mousse
-                            (porosité, gel, soulèvement).
-                            – Sur toits terrasses ou pentes faibles : la stagnation d’eau est prioritaire (risque
-                            d’infiltration rapide).
-                            • Si des obstacles sont présents (velux, souches, sorties, panneaux…), insiste sur
-                            l’étanchéité périphérique : solins, raccords, relevés, points bas.
-                            • Utilise la note de dégradation globale pour caler le discours :
-                            – < 4 % : rassurant, bon état, entretien léger à prévoir.
-                            – 4–10 % : entretien à programmer pour éviter que la situation ne se dégrade.
-                            – 11–20 % : entretien nécessaire, risques à moyen terme si rien n’est fait.
-                            – 21–40 % : réparation nécessaire, risques d’infiltration significatifs.
-                            – > 40 % : intervention urgente, la toiture n’assure plus correctement son rôle.
-                            • Si les fissures sont absentes mais que moisissure/humidité montent : signale une
-                            usure lente liée au manque d’entretien, avec recommandation forte de
-                            démoussage et nettoyage.
-                            • Si un risque feu est indiqué : mentionne la présence possible de végétation proche,
-                            d’aiguilles/feuilles sur toit, ou de revêtements bitumineux, et recommande un
-                            nettoyage de sécurité et un éloignement de la végétation.
-            
+                            toiture peu usée mais très encrassée/humide doit être présentée comme à
+                            surveiller ou à traiter.
+                            • Adapte le discours au revêtement et à la pente :
+                             – Tuiles / ardoises poreuses : insister sur porosité, gel, soulèvement, besoin de
+                            démoussage.
+                             – Toits terrasses / pentes faibles : priorité à la stagnation d’eau et à l’étanchéité.
+                             – Revêtements métalliques : surveiller la corrosion, les fixations, les joints.
+                            • Si plusieurs revêtements sont présents, mentionne-les et précise celui qui est
+                            le plus fragile ou le plus dégradé.
+                            • Si des obstacles sont présents, insiste sur les zones de joints (solins, raccords,
+                            pénétrations).
+                            • Utilise la note globale et la mutation pour calibrer le niveau de gravité :
+                             – < 4 % : bon état, entretien léger.
+                             – 4–10 % : entretien à programmer, éviter que ça ne se dégrade.
+                             – 11–20 % : entretien nécessaire, risques à moyen terme.
+                             – 21–40 % : réparations à engager, risques d’infiltration significatifs.
+                             – > 40 % : intervention urgente.
+                            • Si le commentaire du couvreur donne une information précise (ex. « toiture
+                            refaite en 2018 », « zone déjà réparée mais reste fragile »), utilise-la pour
+                            nuancer ou corriger la perception donnée par les images.
+                            • Si un risque feu est indiqué, mentionne la végétation proche et la nécessité de
+                            nettoyer/élaguer pour réduire ce risque et éviter l’obstruction des évacuations.
                             FIN_INSTRUCTION
                             """);
     log.info("AI Prompt : {}", prompt);
