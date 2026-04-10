@@ -18,4 +18,7 @@ public record Toit(
     Boolean fissureCassure,
     Boolean risqueFeu,
     Double noteDegradationGlobale,
-    String category) {}
+    String category,
+    String revetement2,
+    Double hauteurBatiment,
+    String commentaireCouvreur) {}

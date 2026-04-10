@@ -34,7 +34,10 @@ public class RoofController {
       @RequestParam(required = false) Boolean fissureCassure,
       @RequestParam(required = false) Boolean risqueFeu,
       @RequestParam(required = false) Double noteDegradationGlobale,
-      @RequestParam(required = false) String categorie) {
+      @RequestParam(required = false) String categorie,
+      @RequestParam(required = false) String revetement2,
+      @RequestParam(required = false) Double hauteurBatiment,
+      @RequestParam(required = false) String commentaireCouvreur) {
 
     return analyseurToiture.apply(
         new Toit(
@@ -55,6 +58,9 @@ public class RoofController {
             fissureCassure,
             risqueFeu,
             noteDegradationGlobale,
-            categorie));
+            categorie,
+            revetement2,
+            hauteurBatiment,
+            commentaireCouvreur));
   }
 }
