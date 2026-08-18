@@ -1,6 +1,7 @@
-package fr.birdia.genai.model;
+package fr.birdia.genai.model.legacy;
 
-public record Toit(
+/** Original flat roof payload (category A-E), kept for callers that have not migrated yet. */
+public record LegacyToit(
     String adresse,
     String gps,
     Integer millesimeImage1,
