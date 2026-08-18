@@ -3,7 +3,8 @@ package fr.birdia.genai.model;
 import fr.birdia.genai.prompt.PromptEngine;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,8 @@ public class AnalyseurToiture implements Function<Toit, String> {
 
   private final Chat chat;
   private final PromptEngine promptEngine;
+  private final CommentaireCouvreurNormalizer commentaireCouvreurNormalizer;
+  private final PanToitureDescriber panToitureDescriber;
 
   @Override
   public String apply(Toit toit) {
@@ -26,76 +29,44 @@ public class AnalyseurToiture implements Function<Toit, String> {
     String aiReport = getAIReport(toit);
     Instant endOfExecution = Instant.now();
 
-    Duration duration = Duration.between(endOfExecution, startOfExecution);
+    Duration duration = Duration.between(startOfExecution, endOfExecution);
     log.info("Report from AI obtained in {} ms.", duration.toMillis());
 
     return aiReport;
   }
 
   private String getAIReport(Toit toit) {
-    var variables =
-        Map.<String, Object>ofEntries(
-            Map.entry("categoryEmoji", getCategoryEmoji(toit)),
-            Map.entry("category", getCategory(toit)),
-            Map.entry("etatToiture", getEtatToiture(toit)),
-            Map.entry("surfaceEnM2", toit.surfaceEnM2()),
-            Map.entry("revetement", toit.revetement()),
-            Map.entry("revetement2", toit.revetement2()),
-            Map.entry("humidite", toit.humidité()),
-            Map.entry("moisissure", toit.moisissure()),
-            Map.entry("usure", toit.usure()),
-            Map.entry("obstacles", toit.obstacles()),
-            Map.entry("fissureCassure", toit.fissureCassure() ? "OUI" : "NON"),
-            Map.entry("risqueFeu", toit.risqueFeu() ? "OUI" : "NON"),
-            Map.entry("hauteurBatiment", toit.hauteurBatiment()),
-            Map.entry("commentaireCouvreur", toit.commentaireCouvreur()));
+    var etatApparent = EtatApparent.fromLibelle(toit.etatApparent());
+    var commentaireCouvreur = commentaireCouvreurNormalizer.apply(toit.commentaireCouvreur());
+
+    var variables = new LinkedHashMap<String, Object>();
+    variables.put("etatApparentEmoji", etatApparent.emoji());
+    variables.put("etatApparent", etatApparent.libelle());
+    variables.put("scoreDegradationVisible", toit.scoreDegradationVisible());
+    variables.put("revetement", toit.revetement());
+    variables.put("revetement2", toit.revetement2());
+    variables.put("surfaceRampantM2", toit.surfaceRampantM2());
+    variables.put("hauteurBatiment", toit.hauteurBatiment());
+    variables.put("penteDeg", toit.penteDeg());
+    variables.put("pansToitureDescriptions", describePans(toit));
+    variables.put("niveauUsure", toit.niveauUsure());
+    variables.put("tauxUsurePct", toit.tauxUsurePct());
+    variables.put("tauxMoisissurePct", toit.tauxMoisissurePct());
+    variables.put("tauxHumiditePct", toit.tauxHumiditePct());
+    variables.put("mutation", toit.mutation());
+    variables.put("risqueVegetationFeu", toit.risqueVegetationFeu());
+    variables.put("commentaireCouvreur", commentaireCouvreur);
+    variables.put("contexteGeographique", toit.contexteGeographique());
 
     var prompt = promptEngine.render(PROMPT_TEMPLATE, variables);
     log.info("AI Prompt : {}", prompt);
     return chat.apply(prompt).replace("```html", "").replace("```", "");
   }
 
-  private String getCategoryEmoji(Toit toit) {
-    var category = getCategory(toit);
-    return switch (category) {
-      case "A" -> "🟢";
-      case "B", "C" -> "🟡";
-      case "D" -> "🟠";
-      case "E" -> "🔴";
-      default -> throw new IllegalStateException("Unexpected value: " + category);
-    };
-  }
-
-  private String getCategory(Toit toit) {
-    var categoryFromConsumer = toit.category();
-    if (categoryFromConsumer == null || categoryFromConsumer.isEmpty()) {
-      var globalRate = toit.noteDegradationGlobale();
-      if (globalRate < 4) {
-        return "A";
-      }
-      if (globalRate >= 4 && globalRate < 11) {
-        return "B";
-      }
-      if (globalRate >= 11 && globalRate < 21) {
-        return "C";
-      }
-      if (globalRate >= 21 && globalRate < 41) {
-        return "D";
-      }
-      return "E";
+  private List<String> describePans(Toit toit) {
+    if (toit.pansToiture3d() == null) {
+      return null;
     }
-    return categoryFromConsumer;
-  }
-
-  private String getEtatToiture(Toit toit) {
-    var category = getCategory(toit);
-    return switch (category) {
-      case "A" -> "Bon état, RAS";
-      case "B" -> "Entretien à prévoir";
-      case "C" -> "Entretien nécessaire";
-      case "D" -> "Réparation nécessaire";
-      case "E" -> "Intervention urgente";
-      default -> throw new IllegalStateException("Unexpected value: " + category);
-    };
+    return toit.pansToiture3d().stream().map(panToitureDescriber).toList();
   }
 }
