@@ -10,11 +10,12 @@ import static org.mockito.Mockito.when;
 import fr.birdia.genai.model.AnalyseurToiture;
 import fr.birdia.genai.model.Chat;
 import fr.birdia.genai.model.CommentaireCouvreurNormalizer;
-import fr.birdia.genai.model.Measurement;
-import fr.birdia.genai.model.PanInfo;
-import fr.birdia.genai.model.PanToiture;
+import fr.birdia.genai.model.EtatApparent;
 import fr.birdia.genai.model.PanToitureDescriber;
-import fr.birdia.genai.model.Toit;
+import fr.birdia.genai.model.toiture.Measurement;
+import fr.birdia.genai.model.toiture.PanInfo;
+import fr.birdia.genai.model.toiture.PanToiture;
+import fr.birdia.genai.model.toiture.Toit;
 import fr.birdia.genai.prompt.PromptEngine;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -53,7 +54,7 @@ class AnalyseurToitureTest {
         "vieillissement normal",
         true,
         commentaireCouvreur,
-        etatApparent,
+        EtatApparent.fromLibelle(etatApparent),
         3.0,
         "proximité littorale");
   }

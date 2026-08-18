@@ -1,5 +1,6 @@
-package fr.birdia.genai.model;
+package fr.birdia.genai.model.toiture;
 
+import fr.birdia.genai.model.EtatApparent;
 import java.util.List;
 
 public record Toit(
@@ -21,6 +22,6 @@ public record Toit(
     String mutation,
     Boolean risqueVegetationFeu,
     String commentaireCouvreur,
-    String etatApparent,
+    EtatApparent etatApparent,
     Double scoreDegradationVisible,
     String contexteGeographique) {}

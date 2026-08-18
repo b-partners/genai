@@ -2,10 +2,10 @@ package fr.birdia.genai.unit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import fr.birdia.genai.model.Measurement;
-import fr.birdia.genai.model.PanInfo;
-import fr.birdia.genai.model.PanToiture;
 import fr.birdia.genai.model.PanToitureDescriber;
+import fr.birdia.genai.model.toiture.Measurement;
+import fr.birdia.genai.model.toiture.PanInfo;
+import fr.birdia.genai.model.toiture.PanToiture;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

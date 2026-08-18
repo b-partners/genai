@@ -1,11 +1,9 @@
 package fr.birdia.genai.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Arrays;
 
-/**
- * The five apparent roof states computed upstream by BIRDIA. The LLM report only explains why the
- * observations are consistent with the transmitted state ; it never recomputes or invents one.
- */
 public enum EtatApparent {
   BON_ETAT("Toiture en bon état", "🟢"),
   ENTRETIEN_PREVENTIF("Entretien préventif", "🟡"),
@@ -21,6 +19,7 @@ public enum EtatApparent {
     this.emoji = emoji;
   }
 
+  @JsonValue
   public String libelle() {
     return libelle;
   }
@@ -29,6 +28,7 @@ public enum EtatApparent {
     return emoji;
   }
 
+  @JsonCreator
   public static EtatApparent fromLibelle(String libelle) {
     return Arrays.stream(values())
         .filter(etat -> etat.libelle.equalsIgnoreCase(libelle))

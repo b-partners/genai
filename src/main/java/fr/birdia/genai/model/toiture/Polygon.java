@@ -1,4 +1,4 @@
-package fr.birdia.genai.model;
+package fr.birdia.genai.model.toiture;
 
 import java.util.List;
 

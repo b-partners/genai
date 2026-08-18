@@ -1,13 +1,10 @@
 package fr.birdia.genai.model;
 
+import fr.birdia.genai.model.toiture.PanToiture;
 import java.util.ArrayList;
 import java.util.function.Function;
 import org.springframework.stereotype.Component;
 
-/**
- * Turns a {@link PanToiture}'s generic measurements/infos into a single readable line, since their
- * labels and units are only known by BIRDIA at runtime and must not be guessed here.
- */
 @Component
 public class PanToitureDescriber implements Function<PanToiture, String> {
 

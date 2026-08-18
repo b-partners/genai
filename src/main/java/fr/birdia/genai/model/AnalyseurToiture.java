@@ -1,10 +1,12 @@
 package fr.birdia.genai.model;
 
+import fr.birdia.genai.model.toiture.Toit;
 import fr.birdia.genai.prompt.PromptEngine;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +38,7 @@ public class AnalyseurToiture implements Function<Toit, String> {
   }
 
   private String getAIReport(Toit toit) {
-    var etatApparent = EtatApparent.fromLibelle(toit.etatApparent());
+    var etatApparent = Objects.requireNonNull(toit.etatApparent(), "État apparent BIRDIA manquant");
     var commentaireCouvreur = commentaireCouvreurNormalizer.apply(toit.commentaireCouvreur());
 
     var variables = new LinkedHashMap<String, Object>();
