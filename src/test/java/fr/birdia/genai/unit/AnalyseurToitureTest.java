@@ -63,4 +63,41 @@ class AnalyseurToitureTest {
 
     assertTrue(!report.contains("```"));
   }
+
+  @Test
+  void does_not_throw_when_optional_fields_are_missing_from_the_request() {
+    // Reproduces the production 502: a real GET / call omitting the optional
+    // query params (revetement2, hauteurBatiment, adresse, gps, ...) used to
+    // NullPointerException out of Map.entry(key, null) in getAIReport.
+    var toit =
+        new Toit(
+            null,
+            null,
+            null,
+            null,
+            14.01,
+            null,
+            null,
+            null,
+            "Tuiles",
+            0.0,
+            100.0,
+            0.0,
+            "NON",
+            null,
+            false,
+            false,
+            80.0,
+            null,
+            null,
+            null,
+            "Pas de commentaire");
+    when(chat.apply(contains("CATÉGORIE"))).thenReturn("<section>ok</section>");
+
+    var report = subject.apply(toit);
+
+    assertTrue(report.contains("ok"));
+    verify(chat).apply(contains("Revêtement 2 : Non renseigné"));
+    verify(chat).apply(contains("Hauteur Bâtiment: Non renseigné"));
+  }
 }

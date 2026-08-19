@@ -3,6 +3,7 @@ package fr.birdia.genai.model;
 import fr.birdia.genai.prompt.PromptEngine;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 public class AnalyseurToiture implements Function<Toit, String> {
 
   private static final String PROMPT_TEMPLATE = "analyseur-toiture";
+  private static final String NON_RENSEIGNE = "Non renseigné";
 
   private final Chat chat;
   private final PromptEngine promptEngine;
@@ -33,22 +35,21 @@ public class AnalyseurToiture implements Function<Toit, String> {
   }
 
   private String getAIReport(Toit toit) {
-    var variables =
-        Map.<String, Object>ofEntries(
-            Map.entry("categoryEmoji", getCategoryEmoji(toit)),
-            Map.entry("category", getCategory(toit)),
-            Map.entry("etatToiture", getEtatToiture(toit)),
-            Map.entry("surfaceEnM2", toit.surfaceEnM2()),
-            Map.entry("revetement", toit.revetement()),
-            Map.entry("revetement2", toit.revetement2()),
-            Map.entry("humidite", toit.humidité()),
-            Map.entry("moisissure", toit.moisissure()),
-            Map.entry("usure", toit.usure()),
-            Map.entry("obstacles", toit.obstacles()),
-            Map.entry("fissureCassure", toit.fissureCassure() ? "OUI" : "NON"),
-            Map.entry("risqueFeu", toit.risqueFeu() ? "OUI" : "NON"),
-            Map.entry("hauteurBatiment", toit.hauteurBatiment()),
-            Map.entry("commentaireCouvreur", toit.commentaireCouvreur()));
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("categoryEmoji", getCategoryEmoji(toit));
+    variables.put("category", getCategory(toit));
+    variables.put("etatToiture", getEtatToiture(toit));
+    variables.put("surfaceEnM2", orDefault(toit.surfaceEnM2()));
+    variables.put("revetement", orDefault(toit.revetement()));
+    variables.put("revetement2", orDefault(toit.revetement2()));
+    variables.put("humidite", orDefault(toit.humidité()));
+    variables.put("moisissure", orDefault(toit.moisissure()));
+    variables.put("usure", orDefault(toit.usure()));
+    variables.put("obstacles", orDefault(toit.obstacles()));
+    variables.put("fissureCassure", Boolean.TRUE.equals(toit.fissureCassure()) ? "OUI" : "NON");
+    variables.put("risqueFeu", Boolean.TRUE.equals(toit.risqueFeu()) ? "OUI" : "NON");
+    variables.put("hauteurBatiment", orDefault(toit.hauteurBatiment()));
+    variables.put("commentaireCouvreur", orDefault(toit.commentaireCouvreur()));
 
     var prompt = promptEngine.render(PROMPT_TEMPLATE, variables);
     log.info("AI Prompt : {}", prompt);
@@ -69,7 +70,7 @@ public class AnalyseurToiture implements Function<Toit, String> {
   private String getCategory(Toit toit) {
     var categoryFromConsumer = toit.category();
     if (categoryFromConsumer == null || categoryFromConsumer.isEmpty()) {
-      var globalRate = toit.noteDegradationGlobale();
+      var globalRate = toit.noteDegradationGlobale() == null ? 0d : toit.noteDegradationGlobale();
       if (globalRate < 4) {
         return "A";
       }
@@ -85,6 +86,10 @@ public class AnalyseurToiture implements Function<Toit, String> {
       return "E";
     }
     return categoryFromConsumer;
+  }
+
+  private Object orDefault(Object value) {
+    return value == null ? NON_RENSEIGNE : value;
   }
 
   private String getEtatToiture(Toit toit) {
