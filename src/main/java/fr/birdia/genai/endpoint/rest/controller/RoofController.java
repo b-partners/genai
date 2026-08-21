@@ -23,4 +23,9 @@ public class RoofController {
   public String hazavao(@RequestBody Toit toit) {
     return analyseurToiture.apply(toit);
   }
+
+  @PostMapping(value = "/", produces = TEXT_HTML_VALUE)
+  public String toitureOnRoot(@RequestBody Toit toit) {
+    return analyseurToiture.apply(toit);
+  }
 }
