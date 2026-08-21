@@ -1,7 +1,12 @@
 package fr.birdia.genai.model;
 
+import fr.birdia.genai.model.toiture.Toit;
+import fr.birdia.genai.prompt.PromptEngine;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +17,13 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class AnalyseurToiture implements Function<Toit, String> {
 
+  private static final String PROMPT_TEMPLATE = "analyseur-toiture";
+  private static final String NON_RENSEIGNE = "Non renseigné";
+
   private final Chat chat;
+  private final PromptEngine promptEngine;
+  private final CommentaireCouvreurNormalizer commentaireCouvreurNormalizer;
+  private final PanToitureDescriber panToitureDescriber;
 
   @Override
   public String apply(Toit toit) {
@@ -21,198 +32,48 @@ public class AnalyseurToiture implements Function<Toit, String> {
     String aiReport = getAIReport(toit);
     Instant endOfExecution = Instant.now();
 
-    Duration duration = Duration.between(endOfExecution, startOfExecution);
+    Duration duration = Duration.between(startOfExecution, endOfExecution);
     log.info("Report from AI obtained in {} ms.", duration.toMillis());
 
     return aiReport;
   }
 
   private String getAIReport(Toit toit) {
-    var prompt =
-        """
-Tu es un artisan couvreur expérimenté, spécialiste des toitures depuis plus de 15 ans.
+    var etatApparent = Objects.requireNonNull(toit.etatApparent(), "État apparent BIRDIA manquant");
+    var commentaireCouvreur = commentaireCouvreurNormalizer.apply(toit.commentaireCouvreur());
 
-Tu viens de lancer une détection sur une image HD qui te donne les informations suivantes :
+    var variables = new LinkedHashMap<String, Object>();
+    variables.put("etatApparentEmoji", etatApparent.emoji());
+    variables.put("etatApparent", etatApparent.libelle());
+    variables.put("scoreDegradationVisible", toit.scoreDegradationVisible());
+    variables.put("revetement", orDefault(toit.revetement()));
+    variables.put("revetement2", toit.revetement2());
+    variables.put("surfaceRampantM2", toit.surfaceRampantM2());
+    variables.put("hauteurBatiment", toit.hauteurBatiment());
+    variables.put("penteDeg", toit.penteDeg());
+    variables.put("pansToitureDescriptions", describePans(toit));
+    variables.put("niveauUsure", toit.niveauUsure());
+    variables.put("tauxUsurePct", toit.tauxUsurePct());
+    variables.put("tauxMoisissurePct", toit.tauxMoisissurePct());
+    variables.put("tauxHumiditePct", toit.tauxHumiditePct());
+    variables.put("mutation", toit.mutation());
+    variables.put("risqueVegetationFeu", toit.risqueVegetationFeu());
+    variables.put("commentaireCouvreur", commentaireCouvreur);
+    variables.put("contexteGeographique", toit.contexteGeographique());
 
-1. Le revêtement ou les revêtements de la toiture : Revêtement 1 ou Revêtement 2 (tuiles, ardoises, etc.).
-2. Hauteur du bâtiment en mètres.
-3. Pente globale en degrés (°).
-4. Niveau d’usure : minime, partielle, avancée, extrême.
-5. Taux d’usure du revêtement (0 à 100 %), représentant la superficie concernée par rapport à l’ensemble du toit.
-6. Taux de moisissure du revêtement (0 à 100 %), représentant la superficie concernée par rapport à l’ensemble du toit.
-7. Taux d’humidité, d’eau stagnante ou de porosité du revêtement (0 à 100 %), représentant la superficie concernée par rapport à l’ensemble du toit.
-8. Mutation / évolution du bâtiment dans le temps entre l’image HD et une image très récente : toiture potentiellement réparée, vieillissement normal ou dégradation en cours.
-9. Présence d’obstacles (cheminée, Velux, panneaux solaires, etc.) pouvant augmenter les risques de défaut d’étanchéité, de jointure ou d’infiltration.
-10. Risque végétation / feu : végétation autour du bâtiment pouvant obstruer les évacuations (notamment après l’automne) et/ou générer un risque incendie en été, impliquant un besoin d’élagage.
-11. Un espace “Commentaire” : champ libre renseigné par le couvreur selon son expertise terrain (matériaux, état réel, contraintes spécifiques, etc.).
-
-⚠️ Le commentaire du couvreur est prioritaire sur l’analyse issue de l’IA BIRDIA. Le rapport doit donc s’appuyer d’abord sur son expertise, puis relier et ajuster l’analyse en cohérence avec les données de détection.
-
-Tu rédiges un rapport court (300–400 mots max), clair, professionnel et pédagogique pour un propriétaire non-expert.
-Ton objectif est double :
-	1.	Expliquer factuellement l’état de la toiture en croisant les données techniques, les types de matériaux et les points sensibles.
-	2.	Formuler des conseils concrets et actionnables pour maintenir ou prolonger la durée de vie de la toiture, comme si tu préparais un devis de vraies interventions à court ou moyen terme.
-
-🛑 Interdictions :
-  • Ne fais aucun disclaimer juridique sauf si le couvreur te le demande dans le commentaire
-  • Ne dépasse jamais 400 mots.
-  • Ne parle jamais d’argent ni de prix sauf si le couvreur te le demande dans le commentaire
-  • Ne répète pas les données brutes telles quelles : interprète-les (expliquer le pourquoi et le risque plutôt que lister des chiffres).
-
-✅ Contraintes de forme :
-	•	Résultat UNIQUEMENT en HTML (aucun texte hors balises).
-	•	Utilise uniquement les emojis suivants : 🟢🟡🟠🔴 🔍 🧼 🛠️ 📸 🧪 🧯
-	•	Utilise la police suivante en priorité : Kumbh Sans
-	•	Respecte strictement la structure suivante, de telle sorte que les blocs INSTRUCTION soient remplacés par l’instruction donnée:
-
-👉 Le commentaire du couvreur est prioritaire : en cas de contradiction entre la détection
-automatique et son commentaire, tu suis le commentaire et tu t’en sers pour
-interpréter/nuancer les données de BIRDIA
-
-<head>
-  <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Kumbh Sans', sans-serif;
-    }
-  </style>
-</head>
-<section>
-  <h2>COMPRENDRE VOTRE RAPPORT</h2>
-"""
-            .concat(
-                String.format(
-                    """
-                    <h3><span>%s</span> CATÉGORIE %s : %s</h3>""",
-                    getCategoryEmoji(toit), getCategory(toit), getEtatToiture(toit)))
-            .concat(
-                String.format(
-                    """
-    INSTRUCTION
-    !IMPORTANT! Cette instruction n'est pas à afficher.
-
-    Voici les donnée à utiliser:
-
-    L’analyse couvre %s m². Revêtement : %s. Revêtement 2 : %s
-    Humidité : %s %% • Moisissure : %s %% • Usure : %s %% — interprète leur impact selon le type de revêtement (ex. stagnation, porosité, vieillissement prématuré).
-    Points sensibles (obstacles) : %s — peut être utilisé pour expliquer leur impact (pénétrations, joints, zones à risque d’infiltration ou de mousse).
-    Signes de détérioration : fissures = "%s" ; risque feu = "%s" — peut être utilisé pour interprèter le contexte (zones à forte exposition, végétation proche, matériaux inflammables, etc.).
-    Hauteur Bâtiment: %s .
-    Commentaire couvreur : "%s " .
-
-    FIN_INSTRUCTION
-
-    <ul>
-      <li>INSTRUCTION: : en commençant par une phrase du type « L’analyse a montré que… », donne une vue d’ensemble : état global de la toiture, éléments rassurants, points d’alerte. Fais le lien entre revêtements, pente, hauteur du bâtiment et pathologies dominantes. Si le commentaire du couvreur précise un point important (ex. matériau exact, défaut connu, zone déjà réparée), intègre-le en priorité dans ton analyse. FIN_INSTRUCTION</li>
-    </ul>
-
-    <ul>
-      <li>INSTRUCTION: : analyse plus finement l’impact de l’humidité, de la moisissure et de l’usure sur la durée de vie de la couverture, en tenant compte du ou des revêtements. Si la mutation indique une dégradation ou une évolution rapide, signale que la situation empire dans le temps et qu’un entretien ou des travaux deviennent prioritaires. FIN_INSTRUCTION</li>
-    </ul>
-""",
-                    toit.surfaceEnM2(),
-                    toit.revetement(),
-                    toit.revetement2(),
-                    toit.humidité(),
-                    toit.moisissure(),
-                    toit.usure(),
-                    toit.obstacles(),
-                    toit.fissureCassure() ? "OUI" : "NON",
-                    toit.risqueFeu() ? "OUI" : "NON",
-                    toit.hauteurBatiment(),
-                    toit.commentaireCouvreur()))
-            .concat(
-                """
-                </section>
-                <section>
-                  <h2>CONSEILS DE L’ARTISAN COUVREUR</h2>
-                """)
-            .concat(
-                """
-<ul>
-  <li>🔍 Inspection ciblée : INSTRUCTION: recommander précisément les zones à vérifier en priorité (autour des obstacles, rives, noues, angles rentrants, points bas, relevés, zones de stagnation d’eau ou de mousse). Tient compte de la hauteur du bâtiment (sécurité, accessibilité) et du commentaire du couvreur si celui-ci signale une zone sensible.. FIN_INSTRUCTION</li>
-  <li>🧼 Entretien recommandé : INSTRUCTION: ON: proposer un entretien adapté au ou aux revêtements et aux pathologies dominantes : démoussage doux, nettoyage des lichens, curage des gouttières et descentes, retrait des feuilles, branches ou débris pouvant boucher les évacuations. Si le risque végétation/feu est présent, insiste sur l’élagage et le nettoyage régulier. FIN_INSTRUCTION</li>
-  <li>🛠️ Travaux à envisager : INSTRUCTION: ON: lister les réparations concrètes en fonction de la gravité (note globale, niveaux d’humidité/moisissure/usure, niveau d’usure qualitative). Exemple : remplacement de tuiles ou ardoises dégradées, reprise des solins, renforcement local de l’étanchéité, traitement d’une zone de terrasse à faible pente. Préciser ce qui est à court terme (prioritaire) et ce qui peut être planifié sur 1–3 ans. FIN_INSTRUCTION</li>
-  <li>📸 Suivi : INSTRUCTION: recommander un rythme de contrôle (visuel / photos / drone) selon la catégorie et la mutation : si la toiture vieillit lentement et la note globale est faible (< 4 %), contrôle tous les 3–5 ans ; si l’encrassement ou l’humidité progressent (4–20 %), contrôle tous les 2–3 ans ; au-delà ( > 20 % ou mutation dégradée), suivi annuel voire après chaque gros épisode météo..FIN_INSTRUCTION</li>
-  <li>🧪 Vérifications complémentaires : INSTRUCTION: ON: proposer, si pertinent, des contrôles ciblés : visite des combles, tests d’arrosage localisés, caméra thermique, ou contrôle après travaux récents. FIN_INSTRUCTION</li>
-</ul>
-""")
-            .concat(
-                """
-</section>
-
-INSTRUCTION
-Logique d’analyse attendue :
-• Donne plus de poids à la moisissure et à l’humidité qu’à l’usure simple : une
-toiture peu usée mais très encrassée/humide doit être présentée comme à
-surveiller ou à traiter.
-• Adapte le discours au revêtement et à la pente :
- – Tuiles / ardoises poreuses : insister sur porosité, gel, soulèvement, besoin de
-démoussage.
- – Toits terrasses / pentes faibles : priorité à la stagnation d’eau et à l’étanchéité.
- – Revêtements métalliques : surveiller la corrosion, les fixations, les joints.
-• Si plusieurs revêtements sont présents, mentionne-les et précise celui qui est
-le plus fragile ou le plus dégradé.
-• Si des obstacles sont présents, insiste sur les zones de joints (solins, raccords,
-pénétrations).
-• Utilise la note globale et la mutation pour calibrer le niveau de gravité :
- – < 4 % : bon état, entretien léger.
- – 4–10 % : entretien à programmer, éviter que ça ne se dégrade.
- – 11–20 % : entretien nécessaire, risques à moyen terme.
- – 21–40 % : réparations à engager, risques d’infiltration significatifs.
- – > 40 % : intervention urgente.
-• Si le commentaire du couvreur donne une information précise (ex. « toiture
-refaite en 2018 », « zone déjà réparée mais reste fragile »), utilise-la pour
-nuancer ou corriger la perception donnée par les images.
-• Si un risque feu est indiqué, mentionne la végétation proche et la nécessité de
-nettoyer/élaguer pour réduire ce risque et éviter l’obstruction des évacuations.
-FIN_INSTRUCTION
-""");
+    var prompt = promptEngine.render(PROMPT_TEMPLATE, variables);
     log.info("AI Prompt : {}", prompt);
     return chat.apply(prompt).replace("```html", "").replace("```", "");
   }
 
-  private String getCategoryEmoji(Toit toit) {
-    var category = getCategory(toit);
-    return switch (category) {
-      case "A" -> "🟢";
-      case "B", "C" -> "🟡";
-      case "D" -> "🟠";
-      case "E" -> "🔴";
-      default -> throw new IllegalStateException("Unexpected value: " + category);
-    };
+  private Object orDefault(Object value) {
+    return value == null ? NON_RENSEIGNE : value;
   }
 
-  private String getCategory(Toit toit) {
-    var categoryFromConsumer = toit.category();
-    if (categoryFromConsumer == null || categoryFromConsumer.isEmpty()) {
-      var globalRate = toit.noteDegradationGlobale();
-      if (globalRate < 4) {
-        return "A";
-      }
-      if (globalRate >= 4 && globalRate < 11) {
-        return "B";
-      }
-      if (globalRate >= 11 && globalRate < 21) {
-        return "C";
-      }
-      if (globalRate >= 21 && globalRate < 41) {
-        return "D";
-      }
-      return "E";
+  private List<String> describePans(Toit toit) {
+    if (toit.pansToiture3d() == null) {
+      return null;
     }
-    return categoryFromConsumer;
-  }
-
-  private String getEtatToiture(Toit toit) {
-    var category = getCategory(toit);
-    return switch (category) {
-      case "A" -> "Bon état, RAS";
-      case "B" -> "Entretien à prévoir";
-      case "C" -> "Entretien nécessaire";
-      case "D" -> "Réparation nécessaire";
-      case "E" -> "Intervention urgente";
-      default -> throw new IllegalStateException("Unexpected value: " + category);
-    };
+    return toit.pansToiture3d().stream().map(panToitureDescriber).toList();
   }
 }

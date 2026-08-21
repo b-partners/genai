@@ -3,113 +3,24 @@ package fr.birdia.genai.endpoint.rest.controller;
 import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 
 import fr.birdia.genai.model.AnalyseurToiture;
-import fr.birdia.genai.model.Toit;
+import fr.birdia.genai.model.toiture.Toit;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * New BIRDIA état apparent contract. See {@link LegacyRoofController} for the previous category A-E
+ * contract kept for callers that have not migrated yet.
+ */
 @RestController
 @AllArgsConstructor
 public class RoofController {
 
   private final AnalyseurToiture analyseurToiture;
 
-  @GetMapping(value = "/toiture", produces = TEXT_HTML_VALUE)
-  public String hazavao(
-      @RequestParam(required = false) String adresse,
-      @RequestParam(required = false) String gps,
-      @RequestParam(required = false) Integer millesimeImage1,
-      @RequestParam(required = false) Integer millesimeImage2,
-      Double surfaceEnM2,
-      @RequestParam(required = false) String typeToiture,
-      @RequestParam(required = false) Double penteMin,
-      @RequestParam(required = false) Double penteMax,
-      String revetement,
-      Double humidité,
-      Double moisissure,
-      Double usure,
-      @RequestParam(required = false) String obstacles,
-      @RequestParam(required = false) String mutation,
-      @RequestParam(required = false) Boolean fissureCassure,
-      @RequestParam(required = false) Boolean risqueFeu,
-      @RequestParam(required = false) Double noteDegradationGlobale,
-      @RequestParam(required = false) String categorie,
-      @RequestParam(required = false) String revetement2,
-      @RequestParam(required = false) Double hauteurBatiment,
-      @RequestParam(required = false) String commentaireCouvreur) {
-
-    return analyseurToiture.apply(
-        new Toit(
-            adresse,
-            gps,
-            millesimeImage1,
-            millesimeImage2,
-            surfaceEnM2,
-            typeToiture,
-            penteMin,
-            penteMax,
-            revetement,
-            humidité,
-            moisissure,
-            usure,
-            obstacles,
-            mutation,
-            fissureCassure,
-            risqueFeu,
-            noteDegradationGlobale,
-            categorie,
-            revetement2,
-            hauteurBatiment,
-            commentaireCouvreur));
-  }
-
-  @GetMapping(value = "/", produces = TEXT_HTML_VALUE)
-  public String toitureOnRoot(
-      @RequestParam(required = false) String adresse,
-      @RequestParam(required = false) String gps,
-      @RequestParam(required = false) Integer millesimeImage1,
-      @RequestParam(required = false) Integer millesimeImage2,
-      Double surfaceEnM2,
-      @RequestParam(required = false) String typeToiture,
-      @RequestParam(required = false) Double penteMin,
-      @RequestParam(required = false) Double penteMax,
-      String revetement,
-      Double humidité,
-      Double moisissure,
-      Double usure,
-      @RequestParam(required = false) String obstacles,
-      @RequestParam(required = false) String mutation,
-      @RequestParam(required = false) Boolean fissureCassure,
-      @RequestParam(required = false) Boolean risqueFeu,
-      @RequestParam(required = false) Double noteDegradationGlobale,
-      @RequestParam(required = false) String categorie,
-      @RequestParam(required = false) String revetement2,
-      @RequestParam(required = false) Double hauteurBatiment,
-      @RequestParam(required = false) String commentaireCouvreur) {
-
-    return analyseurToiture.apply(
-        new Toit(
-            adresse,
-            gps,
-            millesimeImage1,
-            millesimeImage2,
-            surfaceEnM2,
-            typeToiture,
-            penteMin,
-            penteMax,
-            revetement,
-            humidité,
-            moisissure,
-            usure,
-            obstacles,
-            mutation,
-            fissureCassure,
-            risqueFeu,
-            noteDegradationGlobale,
-            categorie,
-            revetement2,
-            hauteurBatiment,
-            commentaireCouvreur));
+  @PostMapping(value = "/toiture", produces = TEXT_HTML_VALUE)
+  public String hazavao(@RequestBody Toit toit) {
+    return analyseurToiture.apply(toit);
   }
 }
